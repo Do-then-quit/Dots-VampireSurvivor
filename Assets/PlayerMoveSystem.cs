@@ -32,7 +32,8 @@ public partial struct PlayerMoveSystem : ISystem
             localTransform.ValueRW = localTransform.ValueRO.Translate(moveVector * player.ValueRO.moveSpeed * deltaTime);
             break;
         }
-
+        
+        
 
     }
 }
