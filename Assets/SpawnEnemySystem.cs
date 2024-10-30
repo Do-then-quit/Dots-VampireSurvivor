@@ -22,7 +22,10 @@ public partial struct SpawnEnemySystem : ISystem
             Entity spawnedEntity = state.EntityManager.Instantiate(spawnEnemyConfig.EnemyPrefabEntity);
             state.EntityManager.SetComponentData(spawnedEntity, new LocalTransform
             {
-                Position = new float3(UnityEngine.Random.Range(-10, 10), UnityEngine.Random.Range(-10, 10), 0),
+                Position = new float3(
+                    UnityEngine.Random.Range(-10.0f, 10.0f), 
+                    UnityEngine.Random.Range(-10.0f, 10.0f), 
+                    0.0f),
                 Rotation = quaternion.identity,
                 Scale = 1.0f,
             });
