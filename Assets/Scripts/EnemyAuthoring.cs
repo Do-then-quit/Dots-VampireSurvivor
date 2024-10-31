@@ -17,6 +17,7 @@ public class EnemyAuthoring : MonoBehaviour
                 moveSpeed = 4.0f,
                 isActive = true,
             });
+            AddComponent(entity, new Enemy());
         }
     }
 }
@@ -31,4 +32,8 @@ public struct BasicStatus : IComponentData
     public float moveSpeed;
     // 적이 활성화되어 있는지 여부
     public bool isActive;
+}
+
+public struct Enemy : IComponentData
+{
 }

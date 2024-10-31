@@ -18,6 +18,13 @@ public class PlayerAuthoring : MonoBehaviour
                 isActive = true
             });
             AddComponent(entity, new Player());
+            AddComponent(entity, new PlayerAttack
+            {
+                AttackCooldown = 1.0f,
+                AttackDamage = 10.0f,
+                AttackRange = 5.0f,
+                TimeSinceLastAttack = 0.0f,
+            });
         }
     }
 }
@@ -25,4 +32,12 @@ public class PlayerAuthoring : MonoBehaviour
 public struct Player : IComponentData
 {
 
+}
+
+public struct PlayerAttack : IComponentData
+{
+    public float AttackCooldown;
+    public float AttackRange;
+    public float AttackDamage;
+    public float TimeSinceLastAttack;
 }
