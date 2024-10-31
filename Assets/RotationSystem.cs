@@ -23,6 +23,7 @@ public partial struct RotationSystem : ISystem
             deltaTime = SystemAPI.Time.DeltaTime,
         };
         rotatingEnemyJob.ScheduleParallel();
+        
     }
     
     [BurstCompile]
