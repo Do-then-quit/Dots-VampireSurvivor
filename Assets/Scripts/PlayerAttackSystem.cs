@@ -1,3 +1,4 @@
+using System;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
@@ -5,11 +6,14 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.Events;
 
 [BurstCompile]
-public partial struct PlayerAttackSystem : ISystem
+public partial class PlayerAttackSystem : SystemBase
 {
-    public void OnUpdate(ref SystemState state)
+    public event EventHandler OnAttack;
+
+    protected override void OnUpdate()
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
         
@@ -38,9 +42,11 @@ public partial struct PlayerAttackSystem : ISystem
                         i++;
                     }
                 }
+                
+                // shoot effect
+                OnAttack?.Invoke(null, EventArgs.Empty);
                 Debug.Log("Hit Enemy : " + i);
             }
         }
     }
 }
-
