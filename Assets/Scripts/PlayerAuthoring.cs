@@ -21,7 +21,7 @@ public class PlayerAuthoring : MonoBehaviour
             AddComponent(entity, new PlayerAttack
             {
                 AttackCooldown = 1.0f,
-                AttackDamage = 10.0f,
+                AttackDamage = 40.0f,
                 AttackRange = 5.0f,
                 TimeSinceLastAttack = 0.0f,
             });
