@@ -11,8 +11,6 @@ using UnityEngine.Events;
 [BurstCompile]
 public partial class PlayerAttackSystem : SystemBase
 {
-    public event EventHandler OnAttack;
-
     protected override void OnUpdate()
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
@@ -44,7 +42,7 @@ public partial class PlayerAttackSystem : SystemBase
                 }
                 
                 // shoot effect
-                OnAttack?.Invoke(null, EventArgs.Empty);
+                EffectEventSystem.PlayAttackEffect(playerPosition);
                 Debug.Log("Hit Enemy : " + i);
             }
         }

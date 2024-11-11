@@ -6,32 +6,35 @@ using UnityEngine;
 
 public class PlayerAttackEffect : MonoBehaviour
 {
-    [SerializeField] GameObject attackSprite;
+    [SerializeField] private GameObject attackSprite;
 
-    private void Start()
+    private void OnEnable()
     {
-        //Todo : why this line doesn't execute????
-        // 이벤트 구독
-        Debug.Log("Subscribe Start");
-        PlayerAttackSystem playerAttackSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PlayerAttackSystem>();
-        playerAttackSystem.OnAttack += PlayEffect;
-        Debug.Log("Subscribe");
+        EffectEventSystem.OnPlayAttackEffect += SpawnAttackEffect;
     }
 
-    // Update is called once per frame
-    
-    private void PlayEffect(object sender, EventArgs e)
+    private void OnDisable()
     {
-        // 이펙트 재생 로직. 여기서 Particle System이나 간단한 애니메이션을 재생할 수 있음.
-        Debug.Log("Player Attack Effect Played!");
-        // 예시: 이펙트를 활성화하여 잠깐 보여주는 방식
-        attackSprite.SetActive(true);
-        Invoke(nameof(DeactivateEffect), 0.2f); // 이펙트가 0.5초 동안 보이도록 설정
+        EffectEventSystem.OnPlayAttackEffect -= SpawnAttackEffect;
     }
 
-    private void DeactivateEffect()
+    private void SpawnAttackEffect(Vector3 position)
     {
-        Debug.Log("Deactivate PlayerAttack Effect");
-        attackSprite.SetActive(false);
+        // 이펙트 프리팹을 인스턴스화하여 지정 위치에 배치
+        GameObject attackSpriteInstance = Instantiate(attackSprite, position, Quaternion.identity);
+        
+        // 이펙트의 지속시간을 제어하거나 ParticleSystem의 Stop 명령 등을 사용해 자동으로 제거
+        Destroy(attackSpriteInstance, 0.5f); // 0.5초 후에 자동 제거
+    }
+}
+
+public static class EffectEventSystem
+{
+    // 특정 위치에 이펙트를 재생하는 이벤트
+    public static event Action<Vector3> OnPlayAttackEffect;
+
+    public static void PlayAttackEffect(Vector3 position)
+    {
+        OnPlayAttackEffect?.Invoke(position);
     }
 }
