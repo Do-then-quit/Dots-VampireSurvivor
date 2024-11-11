@@ -7,8 +7,8 @@ using UnityEngine;
 
 public partial struct SpawnEnemySystem : ISystem
 {
-    public static float spawnDeltaTime = 5.0f;
-    public static float spawnInterval = 5.0f;
+    private static float spawnDeltaTime = 5.0f;
+    private static float spawnInterval = 5.0f;
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<SpawnEnemyConfig>();
@@ -17,7 +17,7 @@ public partial struct SpawnEnemySystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        spawnDeltaTime += UnityEngine.Time.deltaTime;
+        spawnDeltaTime += SystemAPI.Time.DeltaTime;
         if (spawnDeltaTime > spawnInterval)
         {
             spawnDeltaTime = 0.0f;
