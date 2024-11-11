@@ -7,18 +7,31 @@ using UnityEngine;
 
 public partial struct SpawnEnemySystem : ISystem
 {
+    public static float spawnDeltaTime = 5.0f;
+    public static float spawnInterval = 5.0f;
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<SpawnEnemyConfig>();
+        
     }
 
     public void OnUpdate(ref SystemState state)
     {
-        state.Enabled = false;
+        spawnDeltaTime += UnityEngine.Time.deltaTime;
+        if (spawnDeltaTime > spawnInterval)
+        {
+            spawnDeltaTime = 0.0f;
+            SpawnEnemies(ref state);
+        }
+    }
+
+    public void SpawnEnemies(ref SystemState state)
+    {
         SpawnEnemyConfig spawnEnemyConfig = SystemAPI.GetSingleton<SpawnEnemyConfig>();
 
         for (int i = 0; i < spawnEnemyConfig.AmountToSpawn; i++)
         {
+            
             Entity spawnedEntity = state.EntityManager.Instantiate(spawnEnemyConfig.EnemyPrefabEntity);
             state.EntityManager.SetComponentData(spawnedEntity, new LocalTransform
             {

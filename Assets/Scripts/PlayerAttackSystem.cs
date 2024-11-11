@@ -9,9 +9,9 @@ using UnityEngine;
 using UnityEngine.Events;
 
 [BurstCompile]
-public partial class PlayerAttackSystem : SystemBase
+public partial struct PlayerAttackSystem : ISystem
 {
-    protected override void OnUpdate()
+    public void OnUpdate(ref SystemState state)
     {
         float deltaTime = SystemAPI.Time.DeltaTime;
         
@@ -27,7 +27,7 @@ public partial class PlayerAttackSystem : SystemBase
             {
                 attackComponent.ValueRW.TimeSinceLastAttack = 0f; // 공격 시간 초기화
 
-                int i = 0;
+                int numOfGetDamagedEnemy = 0;
                 // 적 쿼리: 범위 내 적들에게 데미지 적용
                 foreach (var (enemyHealth, enemyTransform) 
                          in SystemAPI.Query<RefRW<BasicStatus>, RefRO<LocalTransform>>().WithAll<Enemy>())
@@ -36,14 +36,17 @@ public partial class PlayerAttackSystem : SystemBase
                     {
                         enemyHealth.ValueRW.health -= attackComponent.ValueRO.AttackDamage;
                         
+                        // Todo : play enemy get damage effect
+                        
+                        
                         // 간단한 이펙트를 위해 로그를 출력합니다.
-                        i++;
+                        numOfGetDamagedEnemy++;
                     }
                 }
                 
                 // shoot effect
                 EffectEventSystem.PlayAttackEffect(playerPosition);
-                Debug.Log("Hit Enemy : " + i);
+                Debug.Log("Hit Enemy : " + numOfGetDamagedEnemy);
             }
         }
     }
