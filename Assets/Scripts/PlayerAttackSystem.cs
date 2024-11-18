@@ -46,7 +46,6 @@ public partial struct PlayerAttackSystem : ISystem
                 
                 // shoot effect
                 EffectEventSystem.PlayAttackEffect(playerPosition);
-                Debug.Log("Hit Enemy : " + numOfGetDamagedEnemy);
             }
         }
     }

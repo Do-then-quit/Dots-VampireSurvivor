@@ -33,7 +33,7 @@ public partial struct EnemyRotationSystem : ISystem
         
     }
     
-    //[BurstCompile]
+    [BurstCompile]
     [WithNone(typeof(Player))]
     public partial struct RotatingEnemyJob : IJobEntity
     {

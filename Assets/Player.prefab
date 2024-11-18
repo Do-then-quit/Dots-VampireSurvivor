@@ -97,3 +97,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3424dd97014a64a5a820fdb9729ab287, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerHealth: 100
+  playerRadius: 0.5
+  playerAttackDamage: 34

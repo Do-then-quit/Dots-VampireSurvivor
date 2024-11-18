@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class PlayerAuthoring : MonoBehaviour
 {
+    public float playerHealth;
+    public float playerRadius;
+    public float playerAttackDamage;
     class Baker : Baker<PlayerAuthoring>
     {
         public override void Bake(PlayerAuthoring authoring)
@@ -13,15 +16,16 @@ public class PlayerAuthoring : MonoBehaviour
             var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
             AddComponent(entity, new BasicStatus
             {
-                health = 100.0f,
+                health = authoring.playerHealth,
                 moveSpeed = 10.0f,
-                isActive = true
+                isActive = true,
+                radius = authoring.playerRadius,
             });
             AddComponent(entity, new Player());
             AddComponent(entity, new PlayerAttack
             {
                 AttackCooldown = 1.0f,
-                AttackDamage = 100.0f,
+                AttackDamage = authoring.playerAttackDamage,
                 AttackRange = 5.0f,
                 TimeSinceLastAttack = 0.0f,
             });

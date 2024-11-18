@@ -5,6 +5,9 @@ using UnityEngine;
 
 public class EnemyAuthoring : MonoBehaviour
 {
+    public float enemyHealth;
+    public float enemyRadius;
+    public float enemyAttackDamage;
     class Baker : Baker<EnemyAuthoring>
     {
         public override void Bake(EnemyAuthoring authoring)
@@ -13,9 +16,14 @@ public class EnemyAuthoring : MonoBehaviour
             var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
             AddComponent(entity, new BasicStatus
             {
-                health = 100.0f,
+                health = authoring.enemyHealth,
                 moveSpeed = 4.0f,
                 isActive = true,
+                radius = authoring.enemyRadius,
+            });
+            AddComponent(entity, new EnemyAttack
+            {
+                AttackDamage = authoring.enemyAttackDamage,
             });
             AddComponent(entity, new Enemy());
         }
@@ -32,6 +40,13 @@ public struct BasicStatus : IComponentData
     public float moveSpeed;
     // 적이 활성화되어 있는지 여부
     public bool isActive;
+    // 적의 반지름 크기
+    public float radius;
+}
+
+public struct EnemyAttack : IComponentData
+{
+    public float AttackDamage;
 }
 
 public struct Enemy : IComponentData

@@ -12,12 +12,12 @@ public partial struct EnemyDamageSystem : ISystem
         var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         
         foreach (var (enemyHealth, entity) 
-                 in SystemAPI.Query<RefRO<BasicStatus>>().WithEntityAccess())
+                 in SystemAPI.Query<RefRO<BasicStatus>>().WithAll<Enemy>().WithEntityAccess())
         {
             if (enemyHealth.ValueRO.health <= 0f)
             {
                 // 사망 효과 추가 (간단히 로그 출력)
-                Debug.Log("Enemy Destroyed!");
+                //Debug.Log("Enemy Destroyed!");
 
                 // 적 엔티티 제거
                 commandBuffer.DestroyEntity(entity);
