@@ -17,6 +17,7 @@ public class PlayerAuthoring : MonoBehaviour
             AddComponent(entity, new BasicStatus
             {
                 health = authoring.playerHealth,
+                maxHealth = authoring.playerHealth,
                 moveSpeed = 10.0f,
                 isActive = true,
                 radius = authoring.playerRadius,

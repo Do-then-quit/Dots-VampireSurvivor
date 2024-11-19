@@ -44,7 +44,7 @@ public partial struct PlayerAttackSystem : ISystem
                     }
                 }
                 
-                // shoot effect
+                // shoot effect event
                 EffectEventSystem.PlayAttackEffect(playerPosition);
             }
         }
