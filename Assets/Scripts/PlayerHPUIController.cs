@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class PlayerHPUIController : MonoBehaviour
 {
-    [SerializeField] GameObject playerHPSlider;
+    [SerializeField] private GameObject playerHPSlider;
     // Start is called before the first frame update
     private void OnEnable()
     {
@@ -16,7 +16,6 @@ public class PlayerHPUIController : MonoBehaviour
         playerTakeDamageOnContactSystem.OnDamageTaken += UpdateHPSlider;
 
     }
-
     private void OnDisable()
     {
         if (World.DefaultGameObjectInjectionWorld == null) return;
@@ -24,17 +23,15 @@ public class PlayerHPUIController : MonoBehaviour
             World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PlayerTakeDamageOnContactSystem>();
         playerTakeDamageOnContactSystem.OnDamageTaken -= UpdateHPSlider;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     
     // when player take damage, update hpui
     void UpdateHPSlider(float currentHP, float maxHP)
     {
         if (playerHPSlider == null) return;
+        if (currentHP <= 0.0f)
+        {
+            currentHP = 0.0f;
+        }
         playerHPSlider.GetComponent<Slider>().value = currentHP / maxHP;
     }
 }

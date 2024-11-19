@@ -26,8 +26,7 @@ public partial struct PlayerAttackSystem : ISystem
             if (attackComponent.ValueRW.TimeSinceLastAttack >= attackComponent.ValueRO.AttackCooldown)
             {
                 attackComponent.ValueRW.TimeSinceLastAttack = 0f; // 공격 시간 초기화
-
-                int numOfGetDamagedEnemy = 0;
+                
                 // 적 쿼리: 범위 내 적들에게 데미지 적용
                 foreach (var (enemyHealth, enemyTransform) 
                          in SystemAPI.Query<RefRW<BasicStatus>, RefRO<LocalTransform>>().WithAll<Enemy>())
@@ -37,10 +36,6 @@ public partial struct PlayerAttackSystem : ISystem
                         enemyHealth.ValueRW.health -= attackComponent.ValueRO.AttackDamage;
                         
                         // Todo : play enemy get damage effect
-                        
-                        
-                        // 간단한 이펙트를 위해 로그를 출력합니다.
-                        numOfGetDamagedEnemy++;
                     }
                 }
                 

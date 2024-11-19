@@ -15,6 +15,16 @@ public partial struct PlayerMoveSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        foreach (var player in SystemAPI.Query<RefRO<BasicStatus>>().WithAll<Player>())
+        {
+            if (!player.ValueRO.isActive)
+            {
+                return;
+                //state.Enabled = false;
+            }
+            break;
+        }
+        
         float deltaTime = SystemAPI.Time.DeltaTime;
         float3 moveVector = float3.zero;
         moveVector.x = Input.GetAxis("Horizontal");

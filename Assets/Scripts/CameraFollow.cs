@@ -17,6 +17,10 @@ public class CameraFollow : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("Camera Start");
+        
+        // TODO : scene이 리로드 될때, GetSingleton이 entity를 못찾아온다. (초기화 순서문제? lateupdate에서 수행해도 마찬가지)
+        
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         var playerQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<Player>());
         playerEntity = playerQuery.GetSingletonEntity();
@@ -37,5 +41,6 @@ public class CameraFollow : MonoBehaviour
             // 필요에 따라 카메라가 항상 플레이어를 바라보게 설정 가능
             //transform.LookAt(playerPosition, offset);
         }
+        
     }
 }

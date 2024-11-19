@@ -12,6 +12,7 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
 {
     private float _lastExecuteTime;
     public Action<float, float> OnDamageTaken;
+    public Action OnPlayerDeath;
     
     protected override void OnCreate()
     {
@@ -30,6 +31,7 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
         float3 playerPosition = float3.zero;
         float playerRadius = 0.5f; // 플레이어의 반지름
         float playerHealth = 100.0f;
+        bool playerIsActive = true;
 
         foreach (var (localTransform, playerStatus) 
                  in SystemAPI.Query<RefRO<LocalTransform>, RefRW<BasicStatus>>().WithAll<Player>())
@@ -37,9 +39,13 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
             playerPosition = localTransform.ValueRO.Position;
             playerRadius = playerStatus.ValueRO.radius;
             playerHealth = playerStatus.ValueRO.health;
+            playerIsActive = playerStatus.ValueRO.isActive;
             break;
         }
 
+        // if already dead, don't execute below.
+        if (!playerIsActive) return;
+        
         bool isPlayerHit = false;
         // 몬스터와 충돌 판정
         foreach (var (enemyTransform, enemyStatus, enemyAttack) 
@@ -56,7 +62,7 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
                 Debug.Log("Player hit! Health: " + playerHealth);
             }
         }
-
+        
         // // 플레이어 체력 업데이트
         foreach (var playerStatus in SystemAPI.Query<RefRW<BasicStatus>>().WithAll<Player>())
         {
@@ -65,6 +71,13 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
             if (isPlayerHit)
             {
                 OnDamageTaken?.Invoke(playerStatus.ValueRO.health, playerStatus.ValueRO.maxHealth);
+            }
+
+            // player dead event.
+            if (playerHealth <= 0.0f)
+            {
+                playerStatus.ValueRW.isActive = false;
+                OnPlayerDeath?.Invoke();
             }
             break;
         }
