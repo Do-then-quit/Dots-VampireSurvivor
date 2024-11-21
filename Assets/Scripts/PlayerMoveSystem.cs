@@ -10,6 +10,8 @@ public partial struct PlayerMoveSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
+        // LoadScene이 되어서 다시 전체 씬이 로드 되어도, 이 OnCreate는 다시 실행되지 않는다!
+        Debug.Log("OnCreate MoveSystem");
         state.RequireForUpdate<Player>();
     }
 

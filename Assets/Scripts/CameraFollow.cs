@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Scenes;
 using Unity.Transforms;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    private Entity playerEntity;
+    private Entity playerEntity = Entity.Null;
     
     // World를 통해 EntityManager 접근
     private EntityManager entityManager;
@@ -19,11 +20,12 @@ public class CameraFollow : MonoBehaviour
     {
         Debug.Log("Camera Start");
         
-        // TODO : scene이 리로드 될때, GetSingleton이 entity를 못찾아온다. (초기화 순서문제? lateupdate에서 수행해도 마찬가지)
-        
         entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         var playerQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<Player>());
-        playerEntity = playerQuery.GetSingletonEntity();
+        if (playerQuery.HasSingleton<Player>())
+        {
+            playerEntity = playerQuery.GetSingletonEntity();
+        }
     }
 
     // Update is called once per frame
@@ -40,6 +42,15 @@ public class CameraFollow : MonoBehaviour
             
             // 필요에 따라 카메라가 항상 플레이어를 바라보게 설정 가능
             //transform.LookAt(playerPosition, offset);
+        }
+        else
+        {
+            // 존재하지 않으면 찾는다! 찾을 때까지! 매프레임!
+            var playerQuery = entityManager.CreateEntityQuery(ComponentType.ReadOnly<Player>());
+            if (playerQuery.HasSingleton<Player>())
+            {
+                playerEntity = playerQuery.GetSingletonEntity();
+            }
         }
         
     }
