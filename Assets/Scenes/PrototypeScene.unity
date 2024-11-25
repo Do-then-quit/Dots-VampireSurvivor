@@ -997,7 +997,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverUI: {fileID: 2059633204}
-  subScene: {fileID: 158778818}
 --- !u!4 &1120267436
 Transform:
   m_ObjectHideFlags: 0
