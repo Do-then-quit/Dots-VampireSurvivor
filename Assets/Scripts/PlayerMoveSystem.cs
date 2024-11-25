@@ -36,12 +36,26 @@ public partial struct PlayerMoveSystem : ISystem
             // normalize
             moveVector = math.normalize(moveVector);
         }
+
+        Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(
+            new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.0f));
+        
+        float3 mousePosition = new float3(mouseWorldPosition.x, mouseWorldPosition.y, 0f);
+
         
         // TODO : 플레이어가 한명 뿐인걸 아는데 매번 이렇게 쿼리를 해서 해야하나? 
         //더 좋은 방법을 나중에 찾으면 고치자
         foreach (var (localTransform, player) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<BasicStatus>>().WithAll<Player>())
         {
             localTransform.ValueRW = localTransform.ValueRO.Translate(moveVector * player.ValueRO.moveSpeed * deltaTime);
+            float3 rotateDirection = localTransform.ValueRO.Position - mousePosition;
+            if (math.lengthsq(rotateDirection) > 0.5f)
+            {
+                // Z축 회전만 허용
+                float targetAngle = math.degrees(math.atan2(rotateDirection.y, rotateDirection.x));
+                quaternion targetRotation = quaternion.Euler(0, 0, math.radians(targetAngle));
+                localTransform.ValueRW.Rotation = targetRotation;
+            }
             break;
         }
         
