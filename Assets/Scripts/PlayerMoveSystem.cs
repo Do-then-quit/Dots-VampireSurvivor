@@ -52,7 +52,7 @@ public partial struct PlayerMoveSystem : ISystem
             if (math.lengthsq(rotateDirection) > 0.5f)
             {
                 // Z축 회전만 허용
-                float targetAngle = math.degrees(math.atan2(rotateDirection.y, rotateDirection.x));
+                float targetAngle = math.degrees(math.atan2(rotateDirection.y, rotateDirection.x)) + 90.0f;
                 quaternion targetRotation = quaternion.Euler(0, 0, math.radians(targetAngle));
                 localTransform.ValueRW.Rotation = targetRotation;
             }
