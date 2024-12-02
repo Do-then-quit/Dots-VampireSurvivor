@@ -7,12 +7,13 @@ using UnityEngine;
 
 public partial struct SpawnEnemySystem : ISystem
 {
-    private static float spawnDeltaTime = 5.0f;
-    private static float spawnInterval = 5.0f;
+    private float spawnDeltaTime;
+    private float spawnInterval;
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<SpawnEnemyConfig>();
-        
+        spawnDeltaTime = 0.0f;
+        spawnInterval = 5.0f;
     }
 
     public void OnUpdate(ref SystemState state)
