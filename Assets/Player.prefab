@@ -48,6 +48,7 @@ MonoBehaviour:
   playerHealth: 100
   playerRadius: 0.5
   playerAttackDamage: 34
+  playerRangeAttackGuns: 1
 --- !u!1 &8734919547567045576
 GameObject:
   m_ObjectHideFlags: 0

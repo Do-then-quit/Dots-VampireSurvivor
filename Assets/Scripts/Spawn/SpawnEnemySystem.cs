@@ -30,6 +30,7 @@ public partial struct SpawnEnemySystem : ISystem
     {
         SpawnEnemyConfig spawnEnemyConfig = SystemAPI.GetSingleton<SpawnEnemyConfig>();
 
+        // 하나씩 스폰하지말고, Instantiate메소드로 한번에 많이 소환하고 각 엔티티의 위치를 바꿔주는 식으로 바꿔야 함.
         for (int i = 0; i < spawnEnemyConfig.AmountToSpawn; i++)
         {
             

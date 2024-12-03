@@ -8,6 +8,8 @@ public class PlayerAuthoring : MonoBehaviour
     public float playerHealth;
     public float playerRadius;
     public float playerAttackDamage;
+
+    public int playerRangeAttackGuns;
     class Baker : Baker<PlayerAuthoring>
     {
         public override void Bake(PlayerAuthoring authoring)
@@ -23,12 +25,16 @@ public class PlayerAuthoring : MonoBehaviour
                 radius = authoring.playerRadius,
             });
             AddComponent(entity, new Player());
-            AddComponent(entity, new PlayerAttack
+            AddComponent(entity, new PlayerMeleeAttack
             {
                 AttackCooldown = 1.0f,
                 AttackDamage = authoring.playerAttackDamage,
                 AttackRange = 5.0f,
                 TimeSinceLastAttack = 0.0f,
+            });
+            AddComponent(entity, new PlayerRangeAttack
+            {
+                NumOfGuns = authoring.playerRangeAttackGuns,
             });
         }
     }
@@ -39,10 +45,15 @@ public struct Player : IComponentData
 
 }
 
-public struct PlayerAttack : IComponentData
+public struct PlayerMeleeAttack : IComponentData
 {
     public float AttackCooldown;
     public float AttackRange;
     public float AttackDamage;
     public float TimeSinceLastAttack;
+}
+
+public struct PlayerRangeAttack : IComponentData
+{
+    public int NumOfGuns;
 }

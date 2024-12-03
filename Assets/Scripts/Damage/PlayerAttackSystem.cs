@@ -17,7 +17,7 @@ public partial struct PlayerAttackSystem : ISystem
         
         // 플레이어 공격 컴포넌트 쿼리
         foreach (var (attackComponent, playerTransform) 
-                 in SystemAPI.Query<RefRW<PlayerAttack>, RefRO<LocalTransform>>())
+                 in SystemAPI.Query<RefRW<PlayerMeleeAttack>, RefRO<LocalTransform>>())
         {
             var playerPosition = playerTransform.ValueRO.Position;
             attackComponent.ValueRW.TimeSinceLastAttack += deltaTime;
