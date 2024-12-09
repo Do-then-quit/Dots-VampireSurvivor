@@ -21,6 +21,7 @@ namespace Authoring
                 {
                     Radius = authoring.expBubbleRadius,
                 });
+                AddComponent(entity, new ExpBubble());
             }
         }
     }
@@ -28,11 +29,4 @@ namespace Authoring
 
 public struct ExpBubble : IComponentData
 {
-    public float ExpValue;
 }
-
-public struct ExpBubbleRadius : IComponentData
-{
-    public float Radius;
-}
-

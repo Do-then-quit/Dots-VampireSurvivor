@@ -47,6 +47,8 @@ public class GameOverUIController : MonoBehaviour
         //SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Debug.Log("Load Scene Complete?"); // 호출은 된다. 
+        //World world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
+        //world.GetExistingSystem<PlayerMoveSystem>()
         
     }
     

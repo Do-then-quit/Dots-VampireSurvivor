@@ -38,7 +38,6 @@ public partial struct PlayerMoveSystem : ISystem
             moveVector = math.normalize(moveVector);
         }
 
-        Debug.Log(moveVector);
         Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(
             new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.0f));
         

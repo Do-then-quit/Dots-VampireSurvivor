@@ -8,6 +8,7 @@ public class EnemyAuthoring : MonoBehaviour
     public float enemyHealth;
     public float enemyRadius;
     public float enemyAttackDamage;
+    public float enemySpeed;
     class Baker : Baker<EnemyAuthoring>
     {
         public override void Bake(EnemyAuthoring authoring)
@@ -25,7 +26,7 @@ public class EnemyAuthoring : MonoBehaviour
             });
             AddComponent(entity, new MovementComponent
             {
-                Speed = 8.0f,
+                Speed = authoring.enemySpeed,
             });
             AddComponent(entity, new DamageComponent
             {
