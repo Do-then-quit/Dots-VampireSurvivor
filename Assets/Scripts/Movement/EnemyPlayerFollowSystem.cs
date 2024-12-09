@@ -37,7 +37,7 @@ public partial struct EnemyPlayerFollowSystem : ISystem
         
         
         //separation job set.
-        EntityQuery myQuery = SystemAPI.QueryBuilder().WithAll<BasicStatus, LocalTransform>().WithNone<Player>().Build();
+        EntityQuery myQuery = SystemAPI.QueryBuilder().WithAll<LocalTransform>().WithNone<Player>().Build();
         NativeArray<LocalTransform> enemyLocalTransforms = myQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
         var separationJob = new SeparationJob
         {
@@ -56,13 +56,12 @@ public partial struct EnemyPlayerFollowSystem : ISystem
     // 어떻게 잡이 모든 엔티티들 중에서 올바른 것들만 조회하고 수정되는거지? 좀더 조사해보자.
     // Because Of IJobEntity, IJobChunk의 조금더 간결한 버전이라서 저런 것들이 지원되나봄.
     [BurstCompile]
-    [WithAll(typeof(BasicStatus))]
-    [WithNone(typeof(Player))]
+    [WithAll(typeof(Enemy))]
     public partial struct EnemyChasePlayerJob : IJobEntity
     {
         public float deltaTime;
         public float3 playerPosition;
-        public void Execute(ref LocalTransform localTransform, in BasicStatus basicStatus)
+        public void Execute(ref LocalTransform localTransform, in MovementComponent movement)
         {
             float3 moveDirection = playerPosition - localTransform.Position;
             if (math.lengthsq(moveDirection.xyz) > 1.0f)
@@ -71,13 +70,12 @@ public partial struct EnemyPlayerFollowSystem : ISystem
             }
             localTransform.Position = 
                 localTransform.Position + 
-                (moveDirection * basicStatus.moveSpeed * deltaTime);
+                (moveDirection * movement.Speed * deltaTime);
         }
     }
     
     [BurstCompile]
-    [WithAll(typeof(BasicStatus))]
-    [WithNone(typeof(Player))]
+    [WithAll(typeof(Enemy))]
     private partial struct SeparationJob : IJobEntity
     {
         [DeallocateOnJobCompletion]
@@ -85,7 +83,7 @@ public partial struct EnemyPlayerFollowSystem : ISystem
         public float SeparationDistance;
         public float DeltaTime;
         
-        public void Execute(ref LocalTransform localTransform, in BasicStatus basicStatus)
+        public void Execute(ref LocalTransform localTransform, in MovementComponent movement)
         {
             float3 separationForce = float3.zero;
             
@@ -101,7 +99,7 @@ public partial struct EnemyPlayerFollowSystem : ISystem
                 }
             }
 
-            localTransform.Position += separationForce * DeltaTime * basicStatus.moveSpeed * 0.5f;
+            localTransform.Position += separationForce * DeltaTime * movement.Speed * 0.5f;
         }
     }
 }

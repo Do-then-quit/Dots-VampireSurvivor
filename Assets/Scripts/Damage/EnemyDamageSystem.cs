@@ -19,9 +19,9 @@ public partial struct EnemyDamageSystem : ISystem
         var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         
         foreach (var (enemyHealth, enemyLocalTransform, entity) 
-                 in SystemAPI.Query<RefRO<BasicStatus>, RefRO<LocalTransform>>().WithAll<Enemy>().WithEntityAccess())
+                 in SystemAPI.Query<RefRO<HealthComponent>, RefRO<LocalTransform>>().WithAll<Enemy>().WithEntityAccess())
         {
-            if (enemyHealth.ValueRO.health <= 0f)
+            if (enemyHealth.ValueRO.CurrentHealth <= 0f)
             {
                 // 사망 효과 추가 (간단히 로그 출력)
                 //Debug.Log("Enemy Destroyed!");

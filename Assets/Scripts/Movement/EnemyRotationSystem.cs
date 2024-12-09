@@ -34,12 +34,12 @@ public partial struct EnemyRotationSystem : ISystem
     }
     
     [BurstCompile]
-    [WithNone(typeof(Player))]
+    [WithAll(typeof(Enemy))]
     public partial struct RotatingEnemyJob : IJobEntity
     {
         public float deltaTime;
         public float3 playerPosition;
-        private void Execute(ref LocalTransform localTransform, in BasicStatus basicStatus)
+        private void Execute(ref LocalTransform localTransform)
         {
             float3 moveDirection = playerPosition - localTransform.Position;
 
