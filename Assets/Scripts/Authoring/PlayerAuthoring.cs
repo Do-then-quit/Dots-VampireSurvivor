@@ -16,14 +16,30 @@ public class PlayerAuthoring : MonoBehaviour
         {
             // GetEntity는 게임 오브젝트에서 베이크된 엔티티를 반환합니다.
             var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
-            AddComponent(entity, new BasicStatus
+            AddComponent(entity, new SizeComponent
             {
-                health = authoring.playerHealth,
-                maxHealth = authoring.playerHealth,
-                moveSpeed = 10.0f,
-                isActive = true,
-                radius = authoring.playerRadius,
+                Radius = authoring.playerRadius,
             });
+            AddComponent(entity, new HealthComponent
+            {
+                CurrentHealth = authoring.playerHealth,
+                MaxHealth = authoring.playerHealth,
+            });
+            AddComponent(entity, new MovementComponent
+            {
+                Speed = 10.0f,
+            });
+            AddComponent(entity, new IsAliveComponent
+            {
+                IsAlive = true,
+            });
+            AddComponent(entity, new PlayerLevelComponent
+            {
+                CurrentExp = 0.0f,
+                Level = 1,
+                MaxExp = 100.0f,
+            });
+            
             AddComponent(entity, new Player());
             AddComponent(entity, new PlayerMeleeAttack
             {

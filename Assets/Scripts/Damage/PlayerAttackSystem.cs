@@ -29,11 +29,11 @@ public partial struct PlayerAttackSystem : ISystem
                 
                 // 적 쿼리: 범위 내 적들에게 데미지 적용
                 foreach (var (enemyHealth, enemyTransform) 
-                         in SystemAPI.Query<RefRW<BasicStatus>, RefRO<LocalTransform>>().WithAll<Enemy>())
+                         in SystemAPI.Query<RefRW<HealthComponent>, RefRO<LocalTransform>>().WithAll<Enemy>())
                 {
                     if (math.distance(playerPosition, enemyTransform.ValueRO.Position) <= attackComponent.ValueRO.AttackRange)
                     {
-                        enemyHealth.ValueRW.health -= attackComponent.ValueRO.AttackDamage;
+                        enemyHealth.ValueRW.CurrentHealth -= attackComponent.ValueRO.AttackDamage;
                         
                         // Todo : play enemy get damage effect
                     }

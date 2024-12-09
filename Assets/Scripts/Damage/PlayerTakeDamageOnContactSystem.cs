@@ -33,13 +33,21 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
         float playerHealth = 100.0f;
         bool playerIsActive = true;
 
-        foreach (var (localTransform, playerStatus) 
-                 in SystemAPI.Query<RefRO<LocalTransform>, RefRW<BasicStatus>>().WithAll<Player>())
+        foreach (var (localTransform, 
+                     playerSizeComponent, 
+                     playerHealthComponent, 
+                     isPlayerAliveComponent) 
+                 in SystemAPI.Query<
+                         RefRO<LocalTransform>, 
+                         RefRW<SizeComponent>, 
+                         RefRO<HealthComponent>, 
+                         RefRO<IsAliveComponent>>()
+                     .WithAll<Player>())
         {
             playerPosition = localTransform.ValueRO.Position;
-            playerRadius = playerStatus.ValueRO.radius;
-            playerHealth = playerStatus.ValueRO.health;
-            playerIsActive = playerStatus.ValueRO.isActive;
+            playerRadius = playerSizeComponent.ValueRO.Radius;
+            playerHealth = playerHealthComponent.ValueRO.CurrentHealth;
+            playerIsActive = isPlayerAliveComponent.ValueRO.IsAlive;
             break;
         }
 
@@ -48,35 +56,39 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
         
         bool isPlayerHit = false;
         // 몬스터와 충돌 판정
-        foreach (var (enemyTransform, enemyStatus, enemyAttack) 
-                 in SystemAPI.Query<RefRO<LocalTransform>, RefRO<BasicStatus>, RefRO<EnemyAttack>>().WithAll<Enemy>())
+        foreach (var (enemyTransform, enemySize, enemyAttack) 
+                 in SystemAPI.Query<RefRO<LocalTransform>, RefRO<SizeComponent>, RefRO<DamageComponent>>()
+                     .WithAll<Enemy>())
         {
             float3 enemyPosition = enemyTransform.ValueRO.Position;
             float distance = math.distance(playerPosition, enemyPosition);
             
-            if (distance < (playerRadius + enemyStatus.ValueRO.radius))
+            if (distance < (playerRadius + enemySize.ValueRO.Radius))
             {
                 // 플레이어 체력 감소
                 isPlayerHit = true;
-                playerHealth -= enemyAttack.ValueRO.AttackDamage; // 예: 데미지 10
+                playerHealth -= enemyAttack.ValueRO.Damage; // 예: 데미지 10
                 Debug.Log("Player hit! Health: " + playerHealth);
             }
         }
         
         // // 플레이어 체력 업데이트
-        foreach (var playerStatus in SystemAPI.Query<RefRW<BasicStatus>>().WithAll<Player>())
+        foreach (var (playerHealthComponent, isPlayerAliveComponent )
+                 in SystemAPI.Query<RefRW<HealthComponent>, RefRW<IsAliveComponent>>().WithAll<Player>())
         {
-            playerStatus.ValueRW.health = playerHealth;
+            playerHealthComponent.ValueRW.CurrentHealth = playerHealth;
             // shot player hp ui update.
             if (isPlayerHit)
             {
-                OnDamageTaken?.Invoke(playerStatus.ValueRO.health, playerStatus.ValueRO.maxHealth);
+                OnDamageTaken?.Invoke(
+                    playerHealthComponent.ValueRO.CurrentHealth,
+                    playerHealthComponent.ValueRO.MaxHealth);
             }
 
             // player dead event.
             if (playerHealth <= 0.0f)
             {
-                playerStatus.ValueRW.isActive = false;
+                isPlayerAliveComponent.ValueRW.IsAlive = false;
                 OnPlayerDeath?.Invoke();
             }
             break;

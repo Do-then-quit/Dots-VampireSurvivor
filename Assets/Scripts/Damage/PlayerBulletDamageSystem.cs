@@ -1,3 +1,4 @@
+using System.Drawing;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -13,25 +14,26 @@ public partial struct PlayerBulletDamageSystem : ISystem
 
         foreach (var (bulletTransform, 
                      bulletDamage, 
-                     bulletCollision,
+                     bulletSize,
                      bulletEntity) 
-                 in SystemAPI.Query<RefRO<LocalTransform>, RefRO<BulletDamage>, RefRO<BulletCollision>>()
+                 in SystemAPI.Query<RefRO<LocalTransform>, RefRO<DamageComponent>, RefRO<SizeComponent>>()
                      .WithAll<PlayerBullet>().WithEntityAccess())
         {
             float3 bulletPosition = bulletTransform.ValueRO.Position;
 
-            foreach (var (enemyTransform, enemyStatus) 
-                     in SystemAPI.Query<RefRO<LocalTransform>, RefRW<BasicStatus>>().WithAll<Enemy>())
+            foreach (var (enemyTransform, enemySize, enemyHealth) 
+                     in SystemAPI.Query<RefRO<LocalTransform>, RefRO<SizeComponent>, RefRW<HealthComponent>>()
+                         .WithAll<Enemy>())
             {
                 float3 enemyPosition = enemyTransform.ValueRO.Position;
                 float distanceSquared = math.distancesq(bulletPosition, enemyPosition);
 
-                float radiusSum = enemyStatus.ValueRO.radius + bulletCollision.ValueRO.Size;
+                float radiusSum = enemySize.ValueRO.Radius + bulletSize.ValueRO.Radius;
                 // 충돌 범위 확인
                 if (distanceSquared <= radiusSum * radiusSum)
                 {
                     // 적 체력 감소
-                    enemyStatus.ValueRW.health -= bulletDamage.ValueRO.DamageAmount;
+                    enemyHealth.ValueRW.CurrentHealth -= bulletDamage.ValueRO.Damage;
 
                     // 적 체력이 0 이하면 처리는 따로 시스템이 있다. 일단은 거기서 처리.(enemydamagesystem)
                     // TODO : 근데 확실히 데미지를 부여하는 부분에서 이것도 처리하는게 괜찮아 보인다.

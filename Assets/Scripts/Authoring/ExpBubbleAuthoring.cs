@@ -13,11 +13,11 @@ namespace Authoring
             public override void Bake(ExpBubbleAuthoring authoring)
             {
                 var entity = GetEntity(authoring, TransformUsageFlags.Dynamic);
-                AddComponent(entity, new ExpBubble
+                AddComponent(entity, new ExpValueComponent
                 {
                     ExpValue = authoring.expValue,
                 });
-                AddComponent(entity, new ExpBubbleRadius
+                AddComponent(entity, new SizeComponent
                 {
                     Radius = authoring.expBubbleRadius,
                 });

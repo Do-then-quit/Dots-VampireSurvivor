@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-
+[BurstCompile]
 public partial struct PlayerMoveSystem : ISystem
 {
     public void OnCreate(ref SystemState state)
@@ -17,9 +18,9 @@ public partial struct PlayerMoveSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
-        foreach (var player in SystemAPI.Query<RefRO<BasicStatus>>().WithAll<Player>())
+        foreach (var playerAliveComponent in SystemAPI.Query<RefRO<IsAliveComponent>>().WithAll<Player>())
         {
-            if (!player.ValueRO.isActive)
+            if (!playerAliveComponent.ValueRO.IsAlive)
             {
                 return;
                 //state.Enabled = false;
@@ -37,6 +38,7 @@ public partial struct PlayerMoveSystem : ISystem
             moveVector = math.normalize(moveVector);
         }
 
+        Debug.Log(moveVector);
         Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(
             new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0.0f));
         
@@ -45,9 +47,11 @@ public partial struct PlayerMoveSystem : ISystem
         
         // TODO : 플레이어가 한명 뿐인걸 아는데 매번 이렇게 쿼리를 해서 해야하나? 
         //더 좋은 방법을 나중에 찾으면 고치자
-        foreach (var (localTransform, player) in SystemAPI.Query<RefRW<LocalTransform>, RefRO<BasicStatus>>().WithAll<Player>())
+        foreach (var (localTransform, playerMovementComponent) 
+                 in SystemAPI.Query<RefRW<LocalTransform>, RefRO<MovementComponent>>().WithAll<Player>())
         {
-            localTransform.ValueRW = localTransform.ValueRO.Translate(moveVector * player.ValueRO.moveSpeed * deltaTime);
+            localTransform.ValueRW = localTransform.ValueRO.Translate(
+                moveVector * playerMovementComponent.ValueRO.Speed * deltaTime);
             float3 rotateDirection = localTransform.ValueRO.Position - mousePosition;
             if (math.lengthsq(rotateDirection) > 0.5f)
             {

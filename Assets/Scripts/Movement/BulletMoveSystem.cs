@@ -13,7 +13,7 @@ public partial struct BulletMoveSystem : ISystem
         float deltaTime = SystemAPI.Time.DeltaTime;
 
         foreach (var (localTransform, bullet) 
-                 in SystemAPI.Query<RefRW<LocalTransform>, RefRO<BulletMovement>>())
+                 in SystemAPI.Query<RefRW<LocalTransform>, RefRO<MovementComponent>>().WithAll<PlayerBullet>())
         {
             // 탄환 이동 처리
             localTransform.ValueRW.Position += localTransform.ValueRW.Up() * bullet.ValueRO.Speed * deltaTime;

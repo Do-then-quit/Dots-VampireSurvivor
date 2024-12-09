@@ -13,11 +13,11 @@ public partial struct BulletLifetimeSystem : ISystem
 
         EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
 
-        foreach (var (lifetime, entity) 
-                 in SystemAPI.Query<RefRW<BulletLifetime>>().WithEntityAccess())
+        foreach (var (lifeTimeComponent, entity) 
+                 in SystemAPI.Query<RefRW<LeftLifeTimeComponent>>().WithEntityAccess())
         {
-            lifetime.ValueRW.RemainingTime -= deltaTime;
-            if (lifetime.ValueRW.RemainingTime <= 0f)
+            lifeTimeComponent.ValueRW.LifeTime -= deltaTime;
+            if (lifeTimeComponent.ValueRW.LifeTime <= 0f)
             {
                 ecb.DestroyEntity(entity); // 탄환 삭제
             }
