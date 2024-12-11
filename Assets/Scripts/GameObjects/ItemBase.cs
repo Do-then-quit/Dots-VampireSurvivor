@@ -13,7 +13,7 @@ public abstract class ItemBase : MonoBehaviour
 
     public float ItemRadius;
     // Start is called before the first frame update
-    private IEnumerator Start()
+    protected virtual IEnumerator Start()
     {
         // entity system 이 로드되기까지 0.2초 기다리기... 나중에는 엔티티시스템이 로드되는 이벤트가 있다면 그걸 찾아서 쓰자.
         WorldEntityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
