@@ -10,6 +10,8 @@ public abstract class ItemBase : MonoBehaviour
 {
     protected Entity PlayerEntity;
     protected EntityManager WorldEntityManager;
+
+    public float ItemRadius;
     // Start is called before the first frame update
     private IEnumerator Start()
     {
@@ -41,7 +43,7 @@ public abstract class ItemBase : MonoBehaviour
         // get player location and compare item location
         float3 playerPosition = WorldEntityManager.GetComponentData<LocalTransform>(PlayerEntity).Position;
         // later change this code with item's size.
-        float collisionDetectDistance = WorldEntityManager.GetComponentData<SizeComponent>(PlayerEntity).Radius + 1.0f;
+        float collisionDetectDistance = WorldEntityManager.GetComponentData<SizeComponent>(PlayerEntity).Radius + ItemRadius;
         Vector3 playerVector = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
         float sqrDistance = (transform.position - playerVector).sqrMagnitude;
         
