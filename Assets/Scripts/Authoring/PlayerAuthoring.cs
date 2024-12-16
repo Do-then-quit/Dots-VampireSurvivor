@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Entities;
 using UnityEngine;
 
@@ -52,6 +53,10 @@ public class PlayerAuthoring : MonoBehaviour
             {
                 NumOfGuns = authoring.playerRangeAttackGuns,
             });
+            AddComponent(entity, new PlayerHand
+            {
+                Cards = new FixedList512Bytes<PokerCard>(),
+            });
         }
     }
 }
@@ -72,4 +77,46 @@ public struct PlayerMeleeAttack : IComponentData
 public struct PlayerRangeAttack : IComponentData
 {
     public int NumOfGuns;
+}
+
+public struct PokerCard
+{
+    public int Number; // 1 ~ 13
+    public Suit Suit;  // 문양 (Spades, Hearts, Diamonds, Clubs)
+
+    public PokerCard(int number, string suitString)
+    {
+        Number = number;
+        // "spades", "hearts", "diamonds", "clubs"
+        switch (suitString)
+        {
+            case "spades":
+                Suit = Suit.Spades;
+                break;
+            case "hearts":
+                Suit = Suit.Hearts;
+                break;
+            case "diamonds":
+                Suit = Suit.Diamonds;
+                break;
+            case "clubs":
+                Suit = Suit.Clubs;
+                break;
+            default:
+                Suit = Suit.Clubs;
+                break;
+        }
+    }
+}
+
+public enum Suit
+{
+    Spades,
+    Hearts,
+    Diamonds,
+    Clubs
+}
+public struct PlayerHand : IComponentData
+{
+    public FixedList512Bytes<PokerCard> Cards;
 }

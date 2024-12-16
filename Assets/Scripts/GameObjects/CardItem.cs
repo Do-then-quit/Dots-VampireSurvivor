@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Entities;
 using UnityEngine;
+
 
 [System.Serializable]
 public class CardData
@@ -72,5 +74,16 @@ public class CardItem : ItemBase
     protected override void OnItemCollected()
     {
         //Debug.Log("Card Collected");
+        var playerHand = WorldEntityManager.GetComponentData<PlayerHand>(PlayerEntity);
+        if (playerHand.Cards.Length >= 5)
+        {
+            Debug.Log("Full Hand");
+        }
+        else
+        {
+            var newPokerCard = new PokerCard(cardData.Value, cardData.Suit);
+            playerHand.Cards.Add(newPokerCard);
+            WorldEntityManager.SetComponentData(PlayerEntity, playerHand);
+        }
     }
 }

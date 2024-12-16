@@ -19,7 +19,7 @@ public partial struct PlayerBulletSpawnSystem : ISystem
     public void OnUpdate(ref SystemState state)
     {
         double elapsedTime = SystemAPI.Time.ElapsedTime;
-        BulletSpawnConfig config = SystemAPI.GetSingleton<BulletSpawnConfig>();
+        //BulletSpawnConfig config = SystemAPI.GetSingleton<BulletSpawnConfig>();
 
         // TODO : 0.25 저 숫자도 플레이어에게서 얻어와서 하도록 하자.
         if (elapsedTime - lastShootTime < 0.25)
@@ -29,8 +29,8 @@ public partial struct PlayerBulletSpawnSystem : ISystem
 
         EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
 
-        foreach (var (localTransform, playerRangeAttack )
-                 in SystemAPI.Query<RefRO<LocalTransform>, RefRO<PlayerRangeAttack>>().WithAll<Player>())
+        foreach (var (localTransform, playerRangeAttack, playerHand )
+                 in SystemAPI.Query<RefRO<LocalTransform>, RefRO<PlayerRangeAttack>, RefRO<PlayerHand>>().WithAll<Player>())
         {
             if (playerRangeAttack.ValueRO.NumOfGuns <= 0)
             {
@@ -44,20 +44,21 @@ public partial struct PlayerBulletSpawnSystem : ISystem
             // 탄환 생성 위치 (플레이어 양옆)
             float3 leftBulletPosition = playerPosition + playerRight * -1.5f;
             float3 rightBulletPosition = playerPosition + playerRight * 1.5f;
-
-            if (playerRangeAttack.ValueRO.NumOfGuns == 1)
-            {
-                CreateBullet(ecb, (leftBulletPosition + rightBulletPosition) / 2.0f, playerRotation);
-                break;
-            }
-            // 개수에 따라서 중간에 생성.
-            int bulletSections = playerRangeAttack.ValueRO.NumOfGuns - 1;
-            float3 deltaPosition = (rightBulletPosition - leftBulletPosition) / bulletSections;
-            for (int i = 0; i < playerRangeAttack.ValueRO.NumOfGuns; i++)
-            {
-                CreateBullet(ecb, leftBulletPosition + deltaPosition * i , playerRotation);
-            }
             
+            if (playerHand.ValueRO.Cards.Length <= 0)
+            {
+                // 기본 불렛 쏘기.
+                CreateBullet(ecb, (leftBulletPosition + rightBulletPosition) / 2.0f, playerRotation);
+            }
+            else
+            {
+                // 개수에 따라서 중간에 생성.
+                float3 deltaPosition = (rightBulletPosition - leftBulletPosition) / 4;
+                for (int i = 0; i < playerHand.ValueRO.Cards.Length; i++)
+                {
+                    CreateBullet(ecb, leftBulletPosition + deltaPosition * i , playerRotation);
+                }
+            }
             break;
         }
 
