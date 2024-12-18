@@ -31,7 +31,7 @@ public class DamageUIController : MonoBehaviour
     }
 
 
-    private void DisplayDamageUI(int damageAmount, float3 startPosition)
+    private void DisplayDamageUI(int damageAmount, float3 startPosition, float4 bulletColor)
     {
         var newUI = Instantiate(damageUIPrefab, startPosition, Quaternion.identity);
         var newUIText = newUI.GetComponent<TextMeshPro>();
@@ -39,6 +39,7 @@ public class DamageUIController : MonoBehaviour
         {
             Debug.Log(newUIText.text);
             newUIText.text = damageAmount.ToString();
+            newUIText.color = new Color(bulletColor.x, bulletColor.y, bulletColor.z, bulletColor.w);
         }
     }
     // Update is called once per frame

@@ -3,13 +3,14 @@ using System.Drawing;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 
 public partial class PlayerBulletDamageSystem : SystemBase
 {
     
-    public Action<int, float3> OnBulletDamage;
+    public Action<int, float3, float4> OnBulletDamage;
     protected override void OnUpdate()
     {
         // 엔티티 커맨드 버퍼 생성 (탄환 제거에 사용)
@@ -18,8 +19,14 @@ public partial class PlayerBulletDamageSystem : SystemBase
         foreach (var (bulletTransform, 
                      bulletDamage, 
                      bulletSize,
+                     bulletColor,
                      bulletEntity) 
-                 in SystemAPI.Query<RefRO<LocalTransform>, RefRO<DamageComponent>, RefRO<SizeComponent>>()
+                 in SystemAPI.Query<
+                         RefRO<LocalTransform>, 
+                         RefRO<DamageComponent>, 
+                         RefRO<SizeComponent>,
+                         RefRO<URPMaterialPropertyBaseColor>
+                     >()
                      .WithAll<PlayerBullet>().WithEntityAccess())
         {
             float3 bulletPosition = bulletTransform.ValueRO.Position;
@@ -47,7 +54,7 @@ public partial class PlayerBulletDamageSystem : SystemBase
                     // }
                     
                     // damage event
-                    OnBulletDamage?.Invoke((int)bulletDamage.ValueRO.Damage, enemyPosition);
+                    OnBulletDamage?.Invoke((int)bulletDamage.ValueRO.Damage, enemyPosition, bulletColor.ValueRO.Value);
                     
                     // 탄환 제거
                     ecb.DestroyEntity(bulletEntity);

@@ -37,7 +37,7 @@ public partial struct EnemyPlayerFollowSystem : ISystem
         
         
         //separation job set.
-        EntityQuery myQuery = SystemAPI.QueryBuilder().WithAll<LocalTransform>().WithNone<Player>().Build();
+        EntityQuery myQuery = SystemAPI.QueryBuilder().WithAll<LocalTransform>().WithAll<Enemy>().Build();
         NativeArray<LocalTransform> enemyLocalTransforms = myQuery.ToComponentDataArray<LocalTransform>(Allocator.TempJob);
         var separationJob = new SeparationJob
         {
