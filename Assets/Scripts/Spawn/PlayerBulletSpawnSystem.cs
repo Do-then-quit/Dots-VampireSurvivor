@@ -2,7 +2,9 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Rendering;
 using Unity.Transforms;
+using Unity.VisualScripting;
 
 [BurstCompile]
 public partial struct PlayerBulletSpawnSystem : ISystem
@@ -56,7 +58,10 @@ public partial struct PlayerBulletSpawnSystem : ISystem
                 float3 deltaPosition = (rightBulletPosition - leftBulletPosition) / 4;
                 for (int i = 0; i < playerHand.ValueRO.Cards.Length; i++)
                 {
-                    CreateBullet(ecb, leftBulletPosition + deltaPosition * i , playerRotation);
+                    CreateCardBullet(
+                        ecb, 
+                        leftBulletPosition + deltaPosition * i , 
+                        playerRotation, playerHand.ValueRO.Cards[i]);
                 }
             }
             break;
@@ -77,6 +82,37 @@ public partial struct PlayerBulletSpawnSystem : ISystem
             Rotation = rotation,
             Scale = 1f
         });
+    }
 
+    private void CreateCardBullet(EntityCommandBuffer ecb, float3 position, quaternion rotation, PokerCard card )
+    {
+        BulletSpawnConfig config = SystemAPI.GetSingleton<BulletSpawnConfig>();
+        Entity bullet = ecb.Instantiate(config.PlayerBulletPrefabEntity);
+        ecb.SetComponent(bullet, new LocalTransform
+        {
+            Position = position,
+            Rotation = rotation,
+            Scale = 1f
+        });
+        float4 bulletColor = new float4(1, 1, 1, 1);
+        switch (card.Suit)
+        {
+            case Suit.Clubs:
+                bulletColor = new float4(0, 1.0f, 0, 1);
+                break;
+            case Suit.Diamonds:
+                bulletColor = new float4(1.0f, 1.0f, 0, 1);
+                break;
+            case Suit.Hearts:
+                bulletColor = new float4(1.0f, 0.0f, 0, 1);
+                break;
+            case Suit.Spades:
+                bulletColor = new float4(0, 0.0f, 0, 1);
+                break;
+        }
+        ecb.SetComponent(bullet, new URPMaterialPropertyBaseColor
+        {
+            Value = bulletColor,
+        });
     }
 }

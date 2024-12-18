@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83d5a0b85a1d94fba867fbc268058f26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerBulletPrefab: {fileID: 7887357150903151013, guid: 517e4e606ef134220816a01ace4a52e9, type: 3}
+  playerBulletPrefab: {fileID: 5757096383252816860, guid: 4490cf4e92af8e948bcd88c712b1401b, type: 3}
 --- !u!4 &245519776
 Transform:
   m_ObjectHideFlags: 0
