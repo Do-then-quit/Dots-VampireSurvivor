@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using Unity.Collections;
 using Unity.Entities;
@@ -5,9 +6,11 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
-public partial struct PlayerBulletDamageSystem : ISystem
+public partial class PlayerBulletDamageSystem : SystemBase
 {
-    public void OnUpdate(ref SystemState state)
+    
+    public Action<int, float3> OnBulletDamage;
+    protected override void OnUpdate()
     {
         // 엔티티 커맨드 버퍼 생성 (탄환 제거에 사용)
         var ecb = new EntityCommandBuffer(Allocator.Temp);
@@ -39,9 +42,13 @@ public partial struct PlayerBulletDamageSystem : ISystem
                     // TODO : 근데 확실히 데미지를 부여하는 부분에서 이것도 처리하는게 괜찮아 보인다.
                     // if (enemy.ValueRW.Health <= 0)
                     // {
+                            // or event
                     //     ecb.DestroyEntity(enemyTransform.GetEntity(state));
                     // }
-
+                    
+                    // damage event
+                    OnBulletDamage?.Invoke((int)bulletDamage.ValueRO.Damage, enemyPosition);
+                    
                     // 탄환 제거
                     ecb.DestroyEntity(bulletEntity);
 
@@ -50,9 +57,8 @@ public partial struct PlayerBulletDamageSystem : ISystem
                 }
             }
         }
-
         // 커맨드 버퍼 실행
-        ecb.Playback(state.EntityManager);
+        ecb.Playback(EntityManager);
         ecb.Dispose();
     }
 }

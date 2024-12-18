@@ -98,4 +98,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   expValue: 10
-  expBubbleRadius: 1
+  expBubbleRadius: 1.5

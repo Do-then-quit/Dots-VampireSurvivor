@@ -6,7 +6,7 @@ using Unity.Transforms;
 using UnityEngine;
 
 [BurstCompile]
-public partial struct EnemyDamageSystem : ISystem
+public partial struct EnemyDestroySystem : ISystem
 {
     public void OnCreate(ref SystemState state)
     {
