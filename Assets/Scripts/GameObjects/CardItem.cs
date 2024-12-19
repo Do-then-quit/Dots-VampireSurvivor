@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Entities;
 using UnityEngine;
 
@@ -83,7 +84,19 @@ public class CardItem : ItemBase
         {
             var newPokerCard = new PokerCard(cardData.Value, cardData.Suit);
             playerHand.Cards.Add(newPokerCard);
+            
+            List<PokerCard> pokerCardsList = new List<PokerCard>();
+            for (int i = 0; i < playerHand.Cards.Length; i++)
+            {
+                pokerCardsList.Add(playerHand.Cards[i]);
+            }
+            
+            var debughandtype = PokerHandEvaluator.EvaluateHand(pokerCardsList);
+            Debug.Log(debughandtype);
+            playerHand.HandType = PokerHandEvaluator.EvaluateHand(pokerCardsList);
+            
             WorldEntityManager.SetComponentData(PlayerEntity, playerHand);
+
         }
     }
 }
