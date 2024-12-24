@@ -9,10 +9,12 @@ public struct PokerCard
 {
     public int Number; // 1 ~ 13
     public Suit Suit;  // 문양 (Spades, Hearts, Diamonds, Clubs)
+    //public bool IsCalculated;
 
     public PokerCard(int number, string suitString)
     {
         Number = number;
+        //IsCalculated = false;
         // "spades", "hearts", "diamonds", "clubs"
         switch (suitString)
         {

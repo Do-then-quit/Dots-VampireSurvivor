@@ -14,6 +14,7 @@ public partial struct PlayerBulletSpawnSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         state.RequireForUpdate<BulletSpawnConfig>();
+        state.RequireForUpdate<PokerHandScoresSingleton>();
         lastShootTime = SystemAPI.Time.ElapsedTime;
     }
 
@@ -61,7 +62,9 @@ public partial struct PlayerBulletSpawnSystem : ISystem
                     CreateCardBullet(
                         ecb, 
                         leftBulletPosition + deltaPosition * i , 
-                        playerRotation, playerHand.ValueRO.Cards[i]);
+                        playerRotation, 
+                        playerHand.ValueRO.Cards[i],
+                        playerHand.ValueRO.HandType);
                 }
             }
             break;
@@ -84,7 +87,7 @@ public partial struct PlayerBulletSpawnSystem : ISystem
         });
     }
 
-    private void CreateCardBullet(EntityCommandBuffer ecb, float3 position, quaternion rotation, PokerCard card )
+    private void CreateCardBullet(EntityCommandBuffer ecb, float3 position, quaternion rotation, PokerCard card, PokerHandType handType )
     {
         BulletSpawnConfig config = SystemAPI.GetSingleton<BulletSpawnConfig>();
         Entity bullet = ecb.Instantiate(config.PlayerBulletPrefabEntity);
@@ -113,6 +116,13 @@ public partial struct PlayerBulletSpawnSystem : ISystem
         ecb.SetComponent(bullet, new URPMaterialPropertyBaseColor
         {
             Value = bulletColor,
+        });
+        var pokerHandScoresData = SystemAPI.GetSingleton<PokerHandScoresSingleton>();
+        float tempDamage = (pokerHandScoresData.BaseScores[(int)handType] + card.Number) 
+                           * pokerHandScoresData.Multipliers[(int)handType];
+        ecb.SetComponent(bullet, new DamageComponent
+        {
+            Damage = tempDamage,
         });
     }
 }

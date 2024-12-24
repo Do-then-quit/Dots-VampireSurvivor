@@ -94,8 +94,9 @@ public class CardItem : ItemBase
             var debughandtype = PokerHandEvaluator.EvaluateHand(pokerCardsList);
             Debug.Log(debughandtype);
             playerHand.HandType = PokerHandEvaluator.EvaluateHand(pokerCardsList);
-            
+            // 플레이어 핸드의 카드들중 어떤 카드가 족보에 들어가는지 아닌지 판별도 해주고 넣어주면 좋겠다.
             WorldEntityManager.SetComponentData(PlayerEntity, playerHand);
+            
 
         }
     }
