@@ -48,8 +48,10 @@ public partial struct EnemyPlayerFollowSystem : ISystem
         //2complete version
         state.Dependency = separationJob.Schedule(state.Dependency);
         state.Dependency.Complete();
-
         
+        // 메모리 정리
+        enemyLocalTransforms.Dispose(state.Dependency);
+
     }
     
     
@@ -78,7 +80,8 @@ public partial struct EnemyPlayerFollowSystem : ISystem
     [WithAll(typeof(Enemy))]
     private partial struct SeparationJob : IJobEntity
     {
-        [DeallocateOnJobCompletion]
+        // 아래 attribute deprecate될 수 있다고 함. 직접 dispose해주자.
+        // [DeallocateOnJobCompletion]
         [ReadOnly] public NativeArray<LocalTransform> EnemyLocalTransforms;
         public float SeparationDistance;
         public float DeltaTime;
