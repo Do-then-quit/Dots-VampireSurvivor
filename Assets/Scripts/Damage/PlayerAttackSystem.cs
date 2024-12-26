@@ -13,6 +13,9 @@ public partial struct PlayerAttackSystem : ISystem
 {
     public void OnUpdate(ref SystemState state)
     {
+        // 일단은 사용안함.
+        state.Enabled = false;
+        
         float deltaTime = SystemAPI.Time.DeltaTime;
         
         // 플레이어 공격 컴포넌트 쿼리

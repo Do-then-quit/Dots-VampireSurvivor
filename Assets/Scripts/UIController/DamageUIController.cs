@@ -37,7 +37,7 @@ public class DamageUIController : MonoBehaviour
         var newUIText = newUI.GetComponent<TextMeshPro>();
         if (newUIText != null)
         {
-            Debug.Log(newUIText.text);
+            //Debug.Log(newUIText.text);
             newUIText.text = damageAmount.ToString();
             newUIText.color = new Color(bulletColor.x, bulletColor.y, bulletColor.z, bulletColor.w);
         }
