@@ -100,4 +100,4 @@ MonoBehaviour:
   enemyHealth: 100
   enemyRadius: 0.5
   enemyAttackDamage: 5
-  enemySpeed: 4
+  enemySpeed: 7

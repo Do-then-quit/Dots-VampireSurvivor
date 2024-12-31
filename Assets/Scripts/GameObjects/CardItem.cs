@@ -10,14 +10,39 @@ using UnityEngine;
 public class CardData
 {
     public int Value; // 1~13 (A~K)
-    public string Suit; // "spades", "hearts", "diamonds", "clubs"
+    public string SuitString; // "spades", "hearts", "diamonds", "clubs"
     public bool IsJoker;
 
     public CardData(int value, string suit, bool isJoker = false)
     {
         Value = value;
-        Suit = suit;
+        SuitString = suit;
         IsJoker = isJoker;
+    }
+
+    public CardData(int value, Suit suit, bool isJoker = false)
+    {
+        IsJoker = isJoker;
+        Value = value;
+        switch (suit)
+        {
+            case Suit.Clubs:
+                SuitString = "clubs";
+                break;
+            case Suit.Diamonds:
+                SuitString = "diamonds";
+                break;
+            case Suit.Hearts:
+                SuitString = "hearts";
+                break;
+            case Suit.Spades:
+                SuitString = "spades";
+                break;
+            default:
+                // change this to blank later.
+                SuitString = "spades";
+                break;
+        }
     }
 
     public static string GetCardTextureAddress(int number, string suit, bool isJoker = false)
@@ -71,14 +96,14 @@ public class CardItem : ItemBase
         
         _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         _handUIComponent = _handUIGameObject.GetComponent<PlayerHandUIController>();
-        UpdateVisuals(CardData.GetCardTextureAddress(cardData.Value, cardData.Suit, cardData.IsJoker));
+        UpdateVisuals(CardData.GetCardTextureAddress(cardData.Value, cardData.SuitString, cardData.IsJoker));
         return base.Start();
     }
-
+    
     public void Initialize(CardData data)
     {
         cardData = data;
-        UpdateVisuals(CardData.GetCardTextureAddress(cardData.Value, cardData.Suit, cardData.IsJoker));
+        UpdateVisuals(CardData.GetCardTextureAddress(cardData.Value, cardData.SuitString, cardData.IsJoker));
     }
 
     private void UpdateVisuals(string texturePath = null)
@@ -90,7 +115,7 @@ public class CardItem : ItemBase
     {
         //Debug.Log("Card Collected");
         var playerHand = WorldEntityManager.GetComponentData<PlayerHand>(PlayerEntity);
-        var newPokerCard = new PokerCard(cardData.Value, cardData.Suit);
+        var newPokerCard = new PokerCard(cardData.Value, cardData.SuitString);
 
         if (playerHand.Cards.Length >= 5)
         {

@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
+using Unity.Entities;
 using UnityEngine;
 
-public struct PokerCard
+public struct PokerCard : IBufferElementData
 {
     public int Number; // 1 ~ 13
     public Suit Suit;  // 문양 (Spades, Hearts, Diamonds, Clubs)
