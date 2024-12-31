@@ -90,32 +90,32 @@ public class CardItem : ItemBase
     {
         //Debug.Log("Card Collected");
         var playerHand = WorldEntityManager.GetComponentData<PlayerHand>(PlayerEntity);
+        var newPokerCard = new PokerCard(cardData.Value, cardData.Suit);
+
         if (playerHand.Cards.Length >= 5)
         {
-            Debug.Log("Full Hand");
+            playerHand.Cards.RemoveAt(0);
+            
         }
-        else
+        playerHand.Cards.Add(newPokerCard);
+
+        List<PokerCard> pokerCardsList = new List<PokerCard>();
+        for (int i = 0; i < playerHand.Cards.Length; i++)
         {
-            var newPokerCard = new PokerCard(cardData.Value, cardData.Suit);
-            playerHand.Cards.Add(newPokerCard);
-
-            List<PokerCard> pokerCardsList = new List<PokerCard>();
-            for (int i = 0; i < playerHand.Cards.Length; i++)
-            {
-                pokerCardsList.Add(playerHand.Cards[i]);
-            }
-
-            var debughandtype = PokerHandEvaluator.EvaluateHand(pokerCardsList);
-            Debug.Log(debughandtype);
-            playerHand.HandType = PokerHandEvaluator.EvaluateHand(pokerCardsList);
-            // 플레이어 핸드의 카드들중 어떤 카드가 족보에 들어가는지 아닌지 판별도 해주고 넣어주면 좋겠다.
-            WorldEntityManager.SetComponentData(PlayerEntity, playerHand);
-
-            // make event to update hand UI
-            // now just direct call
-            _handUIComponent.UpdateHandUI();
-
-
+            pokerCardsList.Add(playerHand.Cards[i]);
         }
+
+        var debughandtype = PokerHandEvaluator.EvaluateHand(pokerCardsList);
+        Debug.Log(debughandtype);
+        playerHand.HandType = PokerHandEvaluator.EvaluateHand(pokerCardsList);
+        // 플레이어 핸드의 카드들중 어떤 카드가 족보에 들어가는지 아닌지 판별도 해주고 넣어주면 좋겠다.
+        WorldEntityManager.SetComponentData(PlayerEntity, playerHand);
+
+        // make event to update hand UI
+        // now just direct call
+        _handUIComponent.UpdateHandUI();
+
+
+        
     }
 }

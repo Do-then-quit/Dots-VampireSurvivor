@@ -33,6 +33,7 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
         float playerHealth = 100.0f;
         bool playerIsActive = true;
 
+        // singleton player로 엔티티를 가져오고 하면 되지 않을까. 
         foreach (var (localTransform, 
                      playerSizeComponent, 
                      playerHealthComponent, 
