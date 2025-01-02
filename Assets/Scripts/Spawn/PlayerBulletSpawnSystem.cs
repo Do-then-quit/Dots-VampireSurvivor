@@ -66,6 +66,7 @@ public partial struct PlayerBulletSpawnSystem : ISystem
                         ecb, 
                         leftBulletPosition + deltaPosition * i , 
                         playerRotation, 
+                        playerUp,
                         playerHand.ValueRO.Cards[i],
                         playerHand.ValueRO.HandType);
                 }
@@ -99,7 +100,7 @@ public partial struct PlayerBulletSpawnSystem : ISystem
         });
     }
 
-    private void CreateCardBullet(EntityCommandBuffer ecb, float3 position, quaternion rotation, PokerCard card, PokerHandType handType )
+    private void CreateCardBullet(EntityCommandBuffer ecb, float3 position, quaternion rotation, float3 up, PokerCard card, PokerHandType handType )
     {
         BulletSpawnConfig config = SystemAPI.GetSingleton<BulletSpawnConfig>();
         Entity bullet = ecb.Instantiate(config.PlayerBulletPrefabEntity);
@@ -135,6 +136,12 @@ public partial struct PlayerBulletSpawnSystem : ISystem
         ecb.SetComponent(bullet, new DamageComponent
         {
             Damage = tempDamage,
+        });
+        float3 bulletVelocity = up * 10.0f;
+        ecb.SetComponent(bullet, new PhysicsVelocity
+        {
+            Linear = bulletVelocity,
+            Angular = new float3(0, 0, 0)
         });
     }
 }
