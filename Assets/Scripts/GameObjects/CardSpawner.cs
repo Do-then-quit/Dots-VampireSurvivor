@@ -12,6 +12,7 @@ public class CardSpawner : MonoBehaviour
 
 
     // left top spawn position, righr bottom spawn position.
+    // let's make map finite then.
     private Vector2 LeftTopSpawnBoxPosition = new Vector2(-140, -70);
     private Vector2 RightBottomSpawnPosition = new Vector2(140, 70);
 

@@ -2,6 +2,8 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Physics.Authoring;
 using Unity.Rendering;
 using Unity.Transforms;
 using Unity.VisualScripting;
@@ -43,6 +45,7 @@ public partial struct PlayerBulletSpawnSystem : ISystem
             float3 playerPosition = localTransform.ValueRO.Position;
             quaternion playerRotation = localTransform.ValueRO.Rotation;
             float3 playerRight = localTransform.ValueRO.Right();
+            float3 playerUp = localTransform.ValueRO.Up();
 
             // 탄환 생성 위치 (플레이어 양옆)
             float3 leftBulletPosition = playerPosition + playerRight * -1.5f;
@@ -51,7 +54,7 @@ public partial struct PlayerBulletSpawnSystem : ISystem
             if (playerHand.ValueRO.Cards.Length <= 0)
             {
                 // 기본 불렛 쏘기.
-                CreateBullet(ecb, (leftBulletPosition + rightBulletPosition) / 2.0f, playerRotation);
+                CreateBullet(ecb, (leftBulletPosition + rightBulletPosition) / 2.0f, playerRotation, playerUp);
             }
             else
             {
@@ -74,16 +77,25 @@ public partial struct PlayerBulletSpawnSystem : ISystem
         ecb.Dispose();
     }
 
-    private void CreateBullet(EntityCommandBuffer ecb, float3 position, quaternion rotation)
+    private void CreateBullet(EntityCommandBuffer ecb, float3 position, quaternion rotation, float3 up)
     {
         BulletSpawnConfig config = SystemAPI.GetSingleton<BulletSpawnConfig>();
         Entity bullet = ecb.Instantiate(config.PlayerBulletPrefabEntity);
-
+        
         ecb.SetComponent(bullet, new LocalTransform
         {
             Position = position,
             Rotation = rotation,
             Scale = 1f
+        });
+        // 생각해보면 탄환마다 속도가 어떻게 정해질지는 모르는 일.
+        // 탄환을 소환할때 그때의 플레이어의 정보에 따라 결정될 것.
+        // 탄환 안에는 초기속도를 저장해둘 필요가 없지 않을까 (탄환의 movement중에서 속도가 필요 없을지도)
+        float3 bulletVelocity = up * 10.0f;
+        ecb.SetComponent(bullet, new PhysicsVelocity
+        {
+            Linear = bulletVelocity,
+            Angular = new float3(0, 0, 0)
         });
     }
 
