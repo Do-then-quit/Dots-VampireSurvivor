@@ -8,7 +8,9 @@ using UnityEngine;
 
 public class DamageUIController : MonoBehaviour
 {
+    public static Action<int, float3, float4> OnBulletDamage;
     [SerializeField] private GameObject damageUIPrefab;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -17,17 +19,12 @@ public class DamageUIController : MonoBehaviour
 
     private void OnEnable()
     {
-        var playerBulletDamageSystem =
-            World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PlayerBulletDamageSystem>();
-        playerBulletDamageSystem.OnBulletDamage += DisplayDamageUI;
+        OnBulletDamage += DisplayDamageUI;
     }
 
     private void OnDisable()
     {
-        if (World.DefaultGameObjectInjectionWorld == null) return;
-        var playerBulletDamageSystem =
-            World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<PlayerBulletDamageSystem>();
-        playerBulletDamageSystem.OnBulletDamage -= DisplayDamageUI;
+        OnBulletDamage -= DisplayDamageUI;
     }
 
 
