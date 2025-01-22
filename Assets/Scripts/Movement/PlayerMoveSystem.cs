@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 [BurstCompile]
@@ -46,11 +47,12 @@ public partial struct PlayerMoveSystem : ISystem
         
         // TODO : 플레이어가 한명 뿐인걸 아는데 매번 이렇게 쿼리를 해서 해야하나? 
         //더 좋은 방법을 나중에 찾으면 고치자
-        foreach (var (localTransform, playerMovementComponent) 
-                 in SystemAPI.Query<RefRW<LocalTransform>, RefRO<MovementComponent>>().WithAll<Player>())
+        foreach (var (localTransform,physicsVelocity, playerMovementComponent) 
+                 in SystemAPI.Query<RefRW<LocalTransform> ,RefRW<PhysicsVelocity>, RefRO<MovementComponent>>().WithAll<Player>())
         {
-            localTransform.ValueRW = localTransform.ValueRO.Translate(
-                moveVector * playerMovementComponent.ValueRO.Speed * deltaTime);
+            physicsVelocity.ValueRW.Linear = moveVector * playerMovementComponent.ValueRO.Speed;
+            // localTransform.ValueRW = localTransform.ValueRO.Translate(
+            //     moveVector * playerMovementComponent.ValueRO.Speed * deltaTime);
             float3 rotateDirection = localTransform.ValueRO.Position - mousePosition;
             if (math.lengthsq(rotateDirection) > 0.5f)
             {
