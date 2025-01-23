@@ -15,6 +15,9 @@ public partial struct EnemyDestroySystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>()) return;
+        
         // 체력이 0 이하인 적을 처리합니다.
         var commandBuffer = new EntityCommandBuffer(Allocator.Temp);
         

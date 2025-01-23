@@ -58,6 +58,8 @@ public partial struct BulletCollisionSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>()) return;
         m_ComponentDataHandles.Update(ref state);
         
         EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);

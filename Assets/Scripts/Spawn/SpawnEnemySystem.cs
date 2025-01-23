@@ -18,6 +18,10 @@ public partial struct SpawnEnemySystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        // 시간이 그냥 흘러갈테니까 이거 처리는 할려면 할수는 있겠다. 투두.
+        if (SystemAPI.HasSingleton<PausedTag>()) return;
+        
         spawnDeltaTime += SystemAPI.Time.DeltaTime;
         if (spawnDeltaTime > spawnInterval)
         {

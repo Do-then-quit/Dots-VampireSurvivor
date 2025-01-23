@@ -12,6 +12,9 @@ public partial struct EnemyRotationSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>()) return;
+        
         // foreach (var (localTransform, enemy) 
         //          in SystemAPI.Query<RefRW<LocalTransform>, RefRO<Enemy>>())
         // {

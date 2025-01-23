@@ -114,7 +114,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletLifetime: 5
   bulletDamage: 50
-  bulletSpeed: 20
+  bulletSpeed: 10
   bulletSize: 1
 --- !u!114 &2302007723210008803
 MonoBehaviour:

@@ -18,6 +18,17 @@ public partial struct EnemyPlayerFollowSystem : ISystem
     [BurstCompile]
     public void OnUpdate(ref SystemState state)
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>())
+        {
+            // 속도 0으로 초기화 해야함.
+            foreach (var enemyVelocity in SystemAPI.Query<RefRW<PhysicsVelocity>>().WithAll<Enemy>())
+            {
+                enemyVelocity.ValueRW.Linear = new float3(0, 0, 0);
+                enemyVelocity.ValueRW.Angular = new float3(0, 0, 0);
+            }
+        }
+        
          float3 playerPosition = float3.zero;
          // player position 얻을 더 좋은 방법 추후 참고. (Entity Access)
          foreach (var localTransform

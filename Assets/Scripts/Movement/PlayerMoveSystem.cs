@@ -19,6 +19,19 @@ public partial struct PlayerMoveSystem : ISystem
 
     public void OnUpdate(ref SystemState state)
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>())
+        {
+            // last frame paused -> bullet stop.
+            foreach (var playerVelocity in 
+                     SystemAPI.Query<RefRW<PhysicsVelocity>>().WithAll<Player>())
+            {
+                playerVelocity.ValueRW.Linear = new float3(0, 0, 0);
+                playerVelocity.ValueRW.Angular = new float3(0, 0, 0);
+            }
+            return;
+        }
+        
         foreach (var playerAliveComponent in SystemAPI.Query<RefRO<IsAliveComponent>>().WithAll<Player>())
         {
             if (!playerAliveComponent.ValueRO.IsAlive)

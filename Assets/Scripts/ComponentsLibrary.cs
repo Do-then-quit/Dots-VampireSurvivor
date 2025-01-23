@@ -39,3 +39,5 @@ public struct LeftLifeTimeComponent : IComponentData
 {
     public float LifeTime;
 }
+
+public struct PausedTag : IComponentData {}
