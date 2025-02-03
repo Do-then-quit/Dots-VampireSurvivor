@@ -58,6 +58,13 @@ public class PlayerAuthoring : MonoBehaviour
                 Cards = new FixedList512Bytes<PokerCard>(),
                 HandType = PokerHandType.HighCard,
             });
+            AddComponent(entity, new PlayerStatsComponent
+            {
+                HP = 0,
+                Damage = 0,
+                Speed = 0,
+                AvailableStatPoints = 0,
+            });
         }
     }
 }
