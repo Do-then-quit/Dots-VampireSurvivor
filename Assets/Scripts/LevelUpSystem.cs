@@ -20,6 +20,7 @@ public partial struct LevelUpSystem : ISystem
 
                 // 게임을 일시정지 상태로 전환
                 //pause.IsPaused = true;
+                level.ValueRW.LevelUpUIOn = true;
 
                 // 디버그 로그
                 Debug.Log($"레벨업! 현재 레벨: {level.ValueRO.Level}, 추가 스탯 포인트: {stats.ValueRO.AvailableStatPoints}");

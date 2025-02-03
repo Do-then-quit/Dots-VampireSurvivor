@@ -39,6 +39,7 @@ public class PlayerAuthoring : MonoBehaviour
                 CurrentExp = 0.0f,
                 Level = 1,
                 MaxExp = 100.0f,
+                LevelUpUIOn = false,
             });
             
             AddComponent(entity, new Player());

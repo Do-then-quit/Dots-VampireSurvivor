@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using Unity.Entities;
 using UnityEngine;
 
-public class PauseManager : MonoBehaviour
+public class PauseManagerBase : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenuUI;
+    [SerializeField] private GameObject levelUpUI;
 
     private bool isPaused = false;
     // Start is called before the first frame update
@@ -21,29 +22,42 @@ public class PauseManager : MonoBehaviour
         {
             if (isPaused)
             {
-                ResumeGame();
+                ResumeGame(pauseMenuUI);
             }
             else
             {
-                PauseGame();
+                PauseGame(pauseMenuUI);
             }
+
+            return;
+        }
+        
+        var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        var playerEntity = entityManager.CreateEntityQuery(typeof(Player)).GetSingletonEntity();
+        bool isLevelUp = entityManager.GetComponentData<PlayerLevelComponent>(playerEntity).LevelUpUIOn;
+        if (isLevelUp)
+        {
+            PauseGame(levelUpUI);
+            var before = entityManager.GetComponentData<PlayerLevelComponent>(playerEntity);
+            before.LevelUpUIOn = false;
+            entityManager.SetComponentData(playerEntity, before);
         }
     }
 
-    public void PauseGame()
+    public void PauseGame(GameObject ui)
     {
         isPaused = true;
-        pauseMenuUI.SetActive(true);
+        ui.SetActive(true);
 
         // PausedTag 추가
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
         entityManager.CreateEntity(typeof(PausedTag));
     }
 
-    public void ResumeGame()
+    public void ResumeGame(GameObject ui)
     {
         isPaused = false;
-        pauseMenuUI.SetActive(false);
+        ui.SetActive(false);
 
         // PausedTag 제거
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;

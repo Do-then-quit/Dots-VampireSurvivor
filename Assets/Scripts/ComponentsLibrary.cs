@@ -33,6 +33,7 @@ public struct PlayerLevelComponent : IComponentData
     public int Level;
     public float CurrentExp;
     public float MaxExp;
+    public bool LevelUpUIOn;
 }
 // 플레이어의 스탯과 할당 가능한 추가 포인트
 public struct PlayerStatsComponent : IComponentData
