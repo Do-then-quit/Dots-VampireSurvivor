@@ -18,7 +18,8 @@ public class PauseManagerBase : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // 레벨업 화면에서는 일시정지 못하게 임시로 막음 ㅋㅋ.
+        if (!levelUpUI.activeSelf && Input.GetKeyDown(KeyCode.Escape))
         {
             if (isPaused)
             {
@@ -42,6 +43,11 @@ public class PauseManagerBase : MonoBehaviour
             before.LevelUpUIOn = false;
             entityManager.SetComponentData(playerEntity, before);
         }
+    }
+
+    public void ResumeGameByLevelUpUI()
+    {
+        ResumeGame(levelUpUI);
     }
 
     public void PauseGame(GameObject ui)
