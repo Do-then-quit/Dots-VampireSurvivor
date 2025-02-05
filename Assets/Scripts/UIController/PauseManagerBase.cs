@@ -34,7 +34,14 @@ public class PauseManagerBase : MonoBehaviour
         }
         
         var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        // playerEntity not set.
+        if (!entityManager.CreateEntityQuery(typeof(Player)).HasSingleton<Player>())
+        {
+            return;
+        }
+
         var playerEntity = entityManager.CreateEntityQuery(typeof(Player)).GetSingletonEntity();
+        
         bool isLevelUp = entityManager.GetComponentData<PlayerLevelComponent>(playerEntity).LevelUpUIOn;
         if (isLevelUp)
         {

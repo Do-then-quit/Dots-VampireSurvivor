@@ -33,9 +33,9 @@ public class CardSpawner : MonoBehaviour
             );
             cardPrefab.GetComponent<CardItem>().cardData = card;
             // 카드 프리팹 생성
-            GameObject spawnedCard = Instantiate(cardPrefab, spawnPosition, Quaternion.identity);
+            Instantiate(cardPrefab, spawnPosition, Quaternion.identity);
             // 카드 정보 업데이트
-            Debug.Log(spawnedCard);
+            //Debug.Log(spawnedCard);
             //spawnedCard.GetComponent<CardItem>().Initialize(card);
 
         }

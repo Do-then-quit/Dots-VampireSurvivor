@@ -2783,7 +2783,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1876435870}
-  - component: {fileID: 1876435869}
+  - component: {fileID: 1876435871}
   m_Layer: 0
   m_Name: DamageUIController
   m_TagString: Untagged
@@ -2791,19 +2791,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1876435869
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1876435868}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c60905aa33517574488ad0c4b4a9e59a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damageUIPrefab: {fileID: 1388245398352723431, guid: 0c66e8aee3f3b5f4db1ec52205d7a960, type: 3}
 --- !u!4 &1876435870
 Transform:
   m_ObjectHideFlags: 0
@@ -2819,6 +2806,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1876435871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1876435868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91620342bcc64fe690e8792e6b2b9afe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DamagePopupPrefab: {fileID: 1388245398352723431, guid: 0c66e8aee3f3b5f4db1ec52205d7a960, type: 3}
+  UICanvas: {fileID: 2108213129}
 --- !u!1 &1877017826
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,8 +1,11 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Systems;
+using Unity.Rendering;
+using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -16,27 +19,32 @@ public partial struct BulletCollisionSystem : ISystem
     internal struct ComponentDataHandles
     {
         public ComponentLookup<DamageComponent> BulletDataLookup;
+        public ComponentLookup<URPMaterialPropertyBaseColor> BulletColorLookup;
         public ComponentLookup<HealthComponent> EnemyHealthLookup;
         
         public ComponentLookup<PlayerBullet> PlayerBulletLookup;
         public ComponentLookup<Enemy> EnemyTagLookup;
+        public ComponentLookup<LocalTransform> LocalTransformLookup;
+        
 
         public ComponentDataHandles(ref SystemState systemState)
         {
             BulletDataLookup = systemState.GetComponentLookup<DamageComponent>(true);
             EnemyHealthLookup = systemState.GetComponentLookup<HealthComponent>(false);
-            
             PlayerBulletLookup = systemState.GetComponentLookup<PlayerBullet>(true);
             EnemyTagLookup = systemState.GetComponentLookup<Enemy>(true);
+            LocalTransformLookup = systemState.GetComponentLookup<LocalTransform>(true);
+            BulletColorLookup = systemState.GetComponentLookup<URPMaterialPropertyBaseColor>(true);
         }
 
         public void Update(ref SystemState systemState)
         {
             BulletDataLookup.Update(ref systemState);
             EnemyHealthLookup.Update(ref systemState);
-            
             PlayerBulletLookup.Update(ref systemState);
             EnemyTagLookup.Update(ref systemState);
+            LocalTransformLookup.Update(ref systemState);
+            BulletColorLookup.Update(ref systemState);
         }
     }
 
@@ -71,7 +79,10 @@ public partial struct BulletCollisionSystem : ISystem
             EnemyHealthLookup = m_ComponentDataHandles.EnemyHealthLookup,
             PlayerBulletLookup = m_ComponentDataHandles.PlayerBulletLookup,
             EnemyTagLookup = m_ComponentDataHandles.EnemyTagLookup,
-            entityCommandBuffer = ecb
+            LocalTransformLookup = m_ComponentDataHandles.LocalTransformLookup,
+            BulletColorLookup = m_ComponentDataHandles.BulletColorLookup,
+            entityCommandBuffer = ecb.AsParallelWriter(),
+            DamageQueue = DamageEventManager.DamageQueue,
         }.Schedule(simulation, state.Dependency);
         state.Dependency.Complete();
         ecb.Playback(state.EntityManager);
@@ -86,8 +97,11 @@ public partial struct BulletCollisionSystem : ISystem
         
         [ReadOnly] public ComponentLookup<PlayerBullet> PlayerBulletLookup;
         [ReadOnly] public ComponentLookup<Enemy> EnemyTagLookup;
+        [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+        [ReadOnly] public ComponentLookup<URPMaterialPropertyBaseColor> BulletColorLookup;
         
-        public EntityCommandBuffer entityCommandBuffer;
+        public EntityCommandBuffer.ParallelWriter entityCommandBuffer;
+        [NativeDisableParallelForRestriction] public NativeQueue<DamageEvent> DamageQueue;
 
         public void Execute(CollisionEvent collisionEvent)
         {
@@ -120,10 +134,16 @@ public partial struct BulletCollisionSystem : ISystem
             // Apply damage to the enemy
             enemyHealth.CurrentHealth -= bulletDamage.Damage;
             EnemyHealthLookup[enemy] = enemyHealth;
-
-
+            
+            float3 enemyPos = LocalTransformLookup[enemy].Position;
+            DamageQueue.Enqueue(new DamageEvent
+            {
+                Damage = bulletDamage.Damage,
+                Position = enemyPos,
+                BulletColor = BulletColorLookup[bullet].Value,
+            });
             // Destroy the bullet
-            entityCommandBuffer.DestroyEntity(bullet);
+            entityCommandBuffer.DestroyEntity(0, bullet);
         }
     }
 }
