@@ -15,6 +15,9 @@ public class PlayerHandUIController : MonoBehaviour
     
     public void UpdateHandUI()
     {
+        _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        _playerEntity = _entityManager.CreateEntityQuery(typeof(Player)).GetSingletonEntity();
+
         Debug.Log("UpdateHandUI");
         _playerHand = _entityManager.GetComponentData<PlayerHand>(_playerEntity);
         for (int i = 0; i < _playerHand.Cards.Length; i++)
@@ -47,16 +50,17 @@ public class PlayerHandUIController : MonoBehaviour
 
     }
     // Start is called before the first frame update
-    private IEnumerator Start()
-    {
-        _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-        
-        
-        // wait until ecs world loaded.
-        yield return new WaitForSeconds(0.2f);
-        _playerEntity = _entityManager.CreateEntityQuery(typeof(Player)).GetSingletonEntity();
-        
-    }
+    // private IEnumerator Start()
+    // {
+    //     _entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+    //     
+    //     
+    //     // wait until ecs world loaded.
+    //     // get singleton이 계속 말썽...
+    //     yield return new WaitForSeconds(0.5f);
+    //     _playerEntity = _entityManager.CreateEntityQuery(typeof(Player)).GetSingletonEntity();
+    //     
+    // }
 
     // Update is called once per frame
     void Update()

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
 using Unity.Transforms;
 using UnityEngine;
 [BurstCompile]
@@ -12,12 +13,25 @@ public partial struct PlayerMoveSystem : ISystem
     public void OnCreate(ref SystemState state)
     {
         // LoadScene이 되어서 다시 전체 씬이 로드 되어도, 이 OnCreate는 다시 실행되지 않는다!
-        Debug.Log("OnCreate MoveSystem");
+        //Debug.Log("OnCreate MoveSystem");
         state.RequireForUpdate<Player>();
     }
 
     public void OnUpdate(ref SystemState state)
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>())
+        {
+            // last frame paused -> bullet stop.
+            foreach (var playerVelocity in 
+                     SystemAPI.Query<RefRW<PhysicsVelocity>>().WithAll<Player>())
+            {
+                playerVelocity.ValueRW.Linear = new float3(0, 0, 0);
+                playerVelocity.ValueRW.Angular = new float3(0, 0, 0);
+            }
+            return;
+        }
+        
         foreach (var playerAliveComponent in SystemAPI.Query<RefRO<IsAliveComponent>>().WithAll<Player>())
         {
             if (!playerAliveComponent.ValueRO.IsAlive)
@@ -46,11 +60,12 @@ public partial struct PlayerMoveSystem : ISystem
         
         // TODO : 플레이어가 한명 뿐인걸 아는데 매번 이렇게 쿼리를 해서 해야하나? 
         //더 좋은 방법을 나중에 찾으면 고치자
-        foreach (var (localTransform, playerMovementComponent) 
-                 in SystemAPI.Query<RefRW<LocalTransform>, RefRO<MovementComponent>>().WithAll<Player>())
+        foreach (var (localTransform,physicsVelocity, playerMovementComponent) 
+                 in SystemAPI.Query<RefRW<LocalTransform> ,RefRW<PhysicsVelocity>, RefRO<MovementComponent>>().WithAll<Player>())
         {
-            localTransform.ValueRW = localTransform.ValueRO.Translate(
-                moveVector * playerMovementComponent.ValueRO.Speed * deltaTime);
+            physicsVelocity.ValueRW.Linear = moveVector * playerMovementComponent.ValueRO.Speed;
+            // localTransform.ValueRW = localTransform.ValueRO.Translate(
+            //     moveVector * playerMovementComponent.ValueRO.Speed * deltaTime);
             float3 rotateDirection = localTransform.ValueRO.Position - mousePosition;
             if (math.lengthsq(rotateDirection) > 0.5f)
             {

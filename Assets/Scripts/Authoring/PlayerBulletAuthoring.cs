@@ -12,7 +12,7 @@ public class PlayerBulletAuthoring : MonoBehaviour
 {
     [SerializeField] private float bulletLifetime = 5.0f;
     [SerializeField] private float bulletDamage = 5.0f;
-    [SerializeField] private float bulletSpeed = 5.0f;
+    [SerializeField] private float bulletSpeed = 10.0f;
     [SerializeField] private float bulletSize = 1.0f;
     private class PlayerBulletBaker : Baker<PlayerBulletAuthoring>
     {

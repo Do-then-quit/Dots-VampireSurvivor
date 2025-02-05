@@ -12,6 +12,7 @@ public class CardSpawner : MonoBehaviour
 
 
     // left top spawn position, righr bottom spawn position.
+    // let's make map finite then.
     private Vector2 LeftTopSpawnBoxPosition = new Vector2(-140, -70);
     private Vector2 RightBottomSpawnPosition = new Vector2(140, 70);
 
@@ -32,9 +33,9 @@ public class CardSpawner : MonoBehaviour
             );
             cardPrefab.GetComponent<CardItem>().cardData = card;
             // 카드 프리팹 생성
-            GameObject spawnedCard = Instantiate(cardPrefab, spawnPosition, Quaternion.identity);
+            Instantiate(cardPrefab, spawnPosition, Quaternion.identity);
             // 카드 정보 업데이트
-            Debug.Log(spawnedCard);
+            //Debug.Log(spawnedCard);
             //spawnedCard.GetComponent<CardItem>().Initialize(card);
 
         }

@@ -20,6 +20,8 @@ public partial class PlayerTakeDamageOnContactSystem : SystemBase
     }
     protected override void OnUpdate()
     {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>()) return;
         // TODO : 0.33f 는 중요한 게임 설정 변수인데 하드코딩되어있다... 추후 수정방법 찾자.
         _lastExecuteTime += SystemAPI.Time.DeltaTime;
         if (_lastExecuteTime < 0.33f)    

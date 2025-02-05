@@ -39,6 +39,7 @@ public class PlayerAuthoring : MonoBehaviour
                 CurrentExp = 0.0f,
                 Level = 1,
                 MaxExp = 100.0f,
+                LevelUpUIOn = false,
             });
             
             AddComponent(entity, new Player());
@@ -57,6 +58,13 @@ public class PlayerAuthoring : MonoBehaviour
             {
                 Cards = new FixedList512Bytes<PokerCard>(),
                 HandType = PokerHandType.HighCard,
+            });
+            AddComponent(entity, new PlayerStatsComponent
+            {
+                HP = 0,
+                Damage = 0,
+                Speed = 0,
+                AvailableStatPoints = 0,
             });
         }
     }

@@ -1,71 +1,150 @@
-using System;
-using System.Drawing;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
+using Unity.Physics;
+using Unity.Physics.Systems;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
-public partial class PlayerBulletDamageSystem : SystemBase
+[RequireMatchingQueriesForUpdate]
+[UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+[UpdateAfter(typeof(PhysicsSystemGroup))]
+public partial struct BulletCollisionSystem : ISystem
 {
+    internal ComponentDataHandles m_ComponentDataHandles;
     
-    public Action<int, float3, float4> OnBulletDamage;
-    protected override void OnUpdate()
+    internal struct ComponentDataHandles
     {
-        // 엔티티 커맨드 버퍼 생성 (탄환 제거에 사용)
-        var ecb = new EntityCommandBuffer(Allocator.Temp);
+        public ComponentLookup<DamageComponent> BulletDataLookup;
+        public ComponentLookup<URPMaterialPropertyBaseColor> BulletColorLookup;
+        public ComponentLookup<HealthComponent> EnemyHealthLookup;
+        
+        public ComponentLookup<PlayerBullet> PlayerBulletLookup;
+        public ComponentLookup<Enemy> EnemyTagLookup;
+        public ComponentLookup<LocalTransform> LocalTransformLookup;
+        
 
-        foreach (var (bulletTransform, 
-                     bulletDamage, 
-                     bulletSize,
-                     bulletColor,
-                     bulletEntity) 
-                 in SystemAPI.Query<
-                         RefRO<LocalTransform>, 
-                         RefRO<DamageComponent>, 
-                         RefRO<SizeComponent>,
-                         RefRO<URPMaterialPropertyBaseColor>
-                     >()
-                     .WithAll<PlayerBullet>().WithEntityAccess())
+        public ComponentDataHandles(ref SystemState systemState)
         {
-            float3 bulletPosition = bulletTransform.ValueRO.Position;
-
-            foreach (var (enemyTransform, enemySize, enemyHealth) 
-                     in SystemAPI.Query<RefRO<LocalTransform>, RefRO<SizeComponent>, RefRW<HealthComponent>>()
-                         .WithAll<Enemy>())
-            {
-                float3 enemyPosition = enemyTransform.ValueRO.Position;
-                float distanceSquared = math.distancesq(bulletPosition, enemyPosition);
-
-                float radiusSum = enemySize.ValueRO.Radius + bulletSize.ValueRO.Radius;
-                // 충돌 범위 확인
-                if (distanceSquared <= radiusSum * radiusSum)
-                {
-                    // 적 체력 감소
-                    enemyHealth.ValueRW.CurrentHealth -= bulletDamage.ValueRO.Damage;
-
-                    // 적 체력이 0 이하면 처리는 따로 시스템이 있다. 일단은 거기서 처리.(enemydamagesystem)
-                    // TODO : 근데 확실히 데미지를 부여하는 부분에서 이것도 처리하는게 괜찮아 보인다.
-                    // if (enemy.ValueRW.Health <= 0)
-                    // {
-                            // or event
-                    //     ecb.DestroyEntity(enemyTransform.GetEntity(state));
-                    // }
-                    
-                    // damage event
-                    OnBulletDamage?.Invoke((int)bulletDamage.ValueRO.Damage, enemyPosition, bulletColor.ValueRO.Value);
-                    
-                    // 탄환 제거
-                    ecb.DestroyEntity(bulletEntity);
-
-                    // 한 탄환은 한 적만 처리
-                    break;
-                }
-            }
+            BulletDataLookup = systemState.GetComponentLookup<DamageComponent>(true);
+            EnemyHealthLookup = systemState.GetComponentLookup<HealthComponent>(false);
+            PlayerBulletLookup = systemState.GetComponentLookup<PlayerBullet>(true);
+            EnemyTagLookup = systemState.GetComponentLookup<Enemy>(true);
+            LocalTransformLookup = systemState.GetComponentLookup<LocalTransform>(true);
+            BulletColorLookup = systemState.GetComponentLookup<URPMaterialPropertyBaseColor>(true);
         }
-        // 커맨드 버퍼 실행
-        ecb.Playback(EntityManager);
+
+        public void Update(ref SystemState systemState)
+        {
+            BulletDataLookup.Update(ref systemState);
+            EnemyHealthLookup.Update(ref systemState);
+            PlayerBulletLookup.Update(ref systemState);
+            EnemyTagLookup.Update(ref systemState);
+            LocalTransformLookup.Update(ref systemState);
+            BulletColorLookup.Update(ref systemState);
+        }
+    }
+
+    [BurstCompile]
+    public void OnCreate(ref SystemState state)
+    {
+        // state.RequireForUpdate(state.GetEntityQuery(
+        //     ComponentType.ReadWrite<DamageComponent>(),
+        //     ComponentType.ReadOnly<HealthComponent>()
+        //     ));
+        state.RequireForUpdate(state.GetEntityQuery(ComponentType.ReadOnly<PlayerBullet>()));
+        state.RequireForUpdate(state.GetEntityQuery(ComponentType.ReadOnly<Enemy>()));
+
+        state.RequireForUpdate<SimulationSingleton>();
+        m_ComponentDataHandles = new ComponentDataHandles(ref state);
+
+    }
+
+    [BurstCompile]
+    public void OnUpdate(ref SystemState state)
+    {
+        // Pause 상태의 엔티티는 업데이트하지 않음
+        if (SystemAPI.HasSingleton<PausedTag>()) return;
+        m_ComponentDataHandles.Update(ref state);
+        
+        EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.TempJob);
+
+        var simulation = SystemAPI.GetSingleton<SimulationSingleton>();
+        state.Dependency = new BulletCollisionEventJob
+        {
+            BulletDataLookup = m_ComponentDataHandles.BulletDataLookup,
+            EnemyHealthLookup = m_ComponentDataHandles.EnemyHealthLookup,
+            PlayerBulletLookup = m_ComponentDataHandles.PlayerBulletLookup,
+            EnemyTagLookup = m_ComponentDataHandles.EnemyTagLookup,
+            LocalTransformLookup = m_ComponentDataHandles.LocalTransformLookup,
+            BulletColorLookup = m_ComponentDataHandles.BulletColorLookup,
+            entityCommandBuffer = ecb.AsParallelWriter(),
+            DamageQueue = DamageEventManager.DamageQueue,
+        }.Schedule(simulation, state.Dependency);
+        state.Dependency.Complete();
+        ecb.Playback(state.EntityManager);
         ecb.Dispose();
     }
+
+    [BurstCompile]
+    struct BulletCollisionEventJob : ICollisionEventsJob
+    {
+        [ReadOnly] public ComponentLookup<DamageComponent> BulletDataLookup;
+        public ComponentLookup<HealthComponent> EnemyHealthLookup;
+        
+        [ReadOnly] public ComponentLookup<PlayerBullet> PlayerBulletLookup;
+        [ReadOnly] public ComponentLookup<Enemy> EnemyTagLookup;
+        [ReadOnly] public ComponentLookup<LocalTransform> LocalTransformLookup;
+        [ReadOnly] public ComponentLookup<URPMaterialPropertyBaseColor> BulletColorLookup;
+        
+        public EntityCommandBuffer.ParallelWriter entityCommandBuffer;
+        [NativeDisableParallelForRestriction] public NativeQueue<DamageEvent> DamageQueue;
+
+        public void Execute(CollisionEvent collisionEvent)
+        {
+            Entity entityA = collisionEvent.EntityA;
+            Entity entityB = collisionEvent.EntityB;
+
+            bool isEntityABullet = BulletDataLookup.HasComponent(entityA) && PlayerBulletLookup.HasComponent(entityA);
+            bool isEntityBBullet = BulletDataLookup.HasComponent(entityB) && PlayerBulletLookup.HasComponent(entityB);
+
+            bool isEntityAEnemy = EnemyHealthLookup.HasComponent(entityA) && EnemyTagLookup.HasComponent(entityA);
+            bool isEntityBEnemy = EnemyHealthLookup.HasComponent(entityB) && EnemyTagLookup.HasComponent(entityB);
+
+            if (isEntityABullet && isEntityBEnemy)
+            {
+                ApplyDamage(entityA, entityB);
+            }
+            else if (isEntityBBullet && isEntityAEnemy)
+            {
+                ApplyDamage(entityB, entityA);
+            }
+            
+            
+        }
+
+        private void ApplyDamage(Entity bullet, Entity enemy)
+        {
+            var bulletDamage = BulletDataLookup[bullet];
+            var enemyHealth = EnemyHealthLookup[enemy];
+
+            // Apply damage to the enemy
+            enemyHealth.CurrentHealth -= bulletDamage.Damage;
+            EnemyHealthLookup[enemy] = enemyHealth;
+            
+            float3 enemyPos = LocalTransformLookup[enemy].Position;
+            DamageQueue.Enqueue(new DamageEvent
+            {
+                Damage = bulletDamage.Damage,
+                Position = enemyPos,
+                BulletColor = BulletColorLookup[bullet].Value,
+            });
+            // Destroy the bullet
+            entityCommandBuffer.DestroyEntity(0, bullet);
+        }
+    }
 }
+
