@@ -49,3 +49,12 @@ public struct LeftLifeTimeComponent : IComponentData
 }
 
 public struct PausedTag : IComponentData {}
+
+public enum GameState { InBattle, InShop }
+
+public struct RoundManager : IComponentData
+{
+    public int RoundNumber;
+    public GameState State;
+    public bool HasSpawnedEnemies;
+}
